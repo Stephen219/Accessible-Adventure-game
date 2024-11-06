@@ -65,6 +65,16 @@ To edit or add features:
 - **Main Source Folder**: The source code resides in the `src` directory. use this directory for all your code edits.
 - **App Directory**: For any page edits, modify files in `src/app`. use this directory for all your page edits.
 - **Components**: Add new components in the `src/components` folder to keep the codebase organized.
+- **Styling**: Use Tailwind CSS for styling. The `styles` folder contains global styles and utility classes.
+- **Firebase Configuration**: The Firebase configuration is in `utils/firebaseConfig.js`. No need to modify this file unless you are changing the Firebase setup.
+
+### Adding New Pages
+To add a new page, create a new file in the `app` directory with the format `[pagename].jsx`. You can also create a folder with the same name as the page and add the page file inside it.
+note : we are using next js 15 where no need to import react in the page file but somehow its forcing us to import react in the page file so please import react in the page file like this 
+
+```jsx
+import React from 'react'
+```
 
 ### Testing with Jest
 This project uses Jest for testing. it is already configured in the project.
