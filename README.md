@@ -82,8 +82,8 @@ pnpm dev
 bun dev
 ```
 
-Visit `http://localhost:3000` in your browser to view the application. The server will reload automatically when code changes are made.
-
+Visit `http://localhost:3000` in your browser to view the application. The server will reload automatically when code changes are made. ensure port 3000 is not in use by another application
+  
 ### Building 
 
 
@@ -103,6 +103,12 @@ bun build
 ## Project Structure and Editing
 
 To edit or add features:
+
+edit while in the development branch
+
+```bash
+git checkout development
+```
 
 - **Main Source Folder**: The source code resides in the `src` directory. use this directory for all your code edits.
 - **App Directory**: For any page edits, modify files in `src/app`. use this directory for all your page edits.
