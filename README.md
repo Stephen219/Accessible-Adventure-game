@@ -4,6 +4,48 @@
 This project is built using [Next.js](https://nextjs.org/) and leverages [Firebase](https://firebase.google.com/) for database management and user authentication. 
 
 
+The **Adventure Game** is an immersive journey where players step into the shoes of a character named **John**, who is stuck in a mysterious forest. As he navigates through the dense woods, John encounters various challenges that require him to solve puzzles using different items he finds along the way. The items John discovers are of two types: **reusable items**, such as a knife, which can be used multiple times, and **non-reusable items**, such as a stick, which are consumed upon use. Players can carry a maximum of six items in their inventory at any given time. If they pick up more items, they must choose which ones to drop.
+
+Throughout the game, the player is tasked with solving challenges by selecting and using the appropriate items from their inventory. If the player finds themselves lacking the right tools to solve a particular challenge, they can spend coins earned from previous challenges to buy new items that might help. For each challenge solved correctly, the player earns coins, which contribute to their overall score. 
+
+As the player progresses through the forest, they face a series of increasingly difficult challenges, with the ultimate goal of completing all the obstacles and making it to the end of the journey. The backend of the game keeps track of the player's progress, including their current inventory, challenge status, and accumulated coins. Meanwhile, the frontend provides an engaging experience through interactive images, voice prompts, and sound effects, making the adventure feel more dynamic.
+
+Later in the game, players can view detailed statistics, including their best scores, inventory status, and performance in solving challenges. This adds a layer of replayability, as players can aim to improve their scores, refine their inventory management, and tackle the challenges in different ways.
+
+
+
+
+
+   ## **to be removed**
+
+
+## Features
+1. User can start the game by saying “start”.
+2. User can pause the game by saying “pause”.
+3. User can resume the game after pausing by saying “resume”.
+4. User can stop the game by saying “stop”.
+5. User can restart the game by saying “restart”.
+6. User can choose to play as a guest or logged-in user.
+7. User’s progress is saved if logged in, but not if playing as a guest.
+8. User can collect items during the game, which will be stored in their inventory.
+9. User can use items from their inventory to solve challenges.
+10. User’s inventory is limited to 6 items at any time.
+11. User can drop items to make space for new ones when the inventory is full.
+12. User earns coins for solving challenges correctly.
+13. User can purchase items using coins if they do not have the necessary items in their inventory.
+14. User can view their current coin balance on the UI.
+15. User can use voice commands such as “repeat” to replay the last audio or “go faster” to speed up the audio.
+16. User can view the current challenge description and instructions on the UI.
+17. User can view their inventory on the UI at any time during gameplay.
+18. Game saves progress for logged-in players, including their inventory, coin balance, and challenge progression.
+19. Guest players’ progress is not saved after the session ends.
+20. User can receive feedback after each challenge, informing them if they answered correctly or incorrectly.
+21. User can advance to the next challenge upon successfully solving the current one.
+22. Game provides walking sound effects to simulate movement between challenges.
+23. User can adjust audio speed using the “go slower” and “go faster” commands.
+24. User can replay the last audio using the “repeat” command.
+25. Game tracks statistics such as total time spent playing and commands used, available for the client to view.
+26. Game handles errors such as invalid input or network failures with appropriate feedback.
 
 ## Getting Started
 
