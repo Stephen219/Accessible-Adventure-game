@@ -3,6 +3,8 @@
 // }
 
 
+
+
 {
   "parser": "@babel/eslint-parser",
   "parserOptions": {
@@ -10,12 +12,13 @@
     "sourceType": "module",
     "ecmaFeatures": {
       "jsx": true
-    }
+    },
+    "requireConfigFile": false
   },
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
-    "plugin:@next/next/recommended"
+    "plugin:@next/next/core-web-vitals"
   ],
   "plugins": [
     "react",

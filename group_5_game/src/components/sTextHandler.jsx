@@ -1,5 +1,18 @@
+
+
 'use client';
 import React from 'react';
+
+
+/**
+ * to import this class, use the following code:
+ *@import { speechToTextHandler } from './sTextHandler';
+  * and then use the following code to start listening:
+  * speechToTextHandler.handleStartListening(setTranscript, setIsListening); 
+*/
+
+ 
+
 /**
  * SpeechToTextHandler Class
  * 
@@ -9,23 +22,10 @@ import React from 'react';
  * @class
 */
 
-/**
- * to import this class, use the following code:
- *@import { speechToTextHandler } from './sTextHandler';
-  * and then use the following code to start listening:
-  * speechToTextHandler.handleStartListening(setTranscript, setIsListening); 
- */
 
 
 class SpeechToTextHandler {
-    /**
-     * Creates an instance of SpeechToTextHandler.
-     * Initializes speech recognition with browser-specific implementation.
-     * 
-     * @constructor
-     * @property {boolean} isListening - Tracks if speech recognition is active
-     * @property {SpeechRecognition} recognition - The Web Speech API recognition instance
-     */
+    
     constructor() {
         this.isListening = false;
       
@@ -33,7 +33,7 @@ class SpeechToTextHandler {
           const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
           if (SpeechRecognition) {
             this.recognition = new SpeechRecognition();
-            this.recognition.continuous = true; // Changed to false to avoid accumulation
+            this.recognition.continuous = true; 
             this.recognition.interimResults = false;
             this.recognition.maxAlternatives = 1;
             this.recognition.lang = 'en-US';
@@ -41,11 +41,7 @@ class SpeechToTextHandler {
             this.recognition.onresult = this.handleResult.bind(this);
             this.recognition.onerror = this.handleError.bind(this);
             this.recognition.onend = this.handleEnd.bind(this);
-          } else {
-            console.error('SpeechRecognition API is not supported in this browser.');
-            this.recognition = null;
           }
-
         }
       }
 
@@ -57,10 +53,15 @@ class SpeechToTextHandler {
      * @private
      */
 
+
       handleResult(event) {
+        // Get only the latest result
         const current = event.results[event.results.length - 1];
+        
+        // Only update if it's a final result
         if (current.isFinal) {
           const finalTranscript = current[0].transcript;
+          
           // Update the transcript state with just this final result
           if (this.onResultCallback) {
             this.onResultCallback(finalTranscript);
@@ -68,13 +69,15 @@ class SpeechToTextHandler {
         }
       }
   
-    
+
     handleError(error) {
       console.error('Speech Recognition Error:', error);
       if (this.onErrorCallback) {
         this.onErrorCallback(error);
       }
     }
+  
+    // Handle End
     handleEnd() {
       console.log('Speech recognition ended.');
       this.isListening = false;
@@ -82,7 +85,8 @@ class SpeechToTextHandler {
         this.onEndCallback();
       }
     }
-    /**
+  
+      /**
      * Starts speech recognition.
      * 
      * @param {function} setTranscript - The state setter for transcript
@@ -94,7 +98,6 @@ class SpeechToTextHandler {
      * // speechToTextHandler.handleStartListening(setTranscript, setIsListening);
      * 
      */
-
     handleStartListening(setTranscript, setIsListening) {
       console.log('handleStartListening invoked');
       this.start({
@@ -114,8 +117,8 @@ class SpeechToTextHandler {
           console.error('Failed to start speech recognition:', error);
         });
     }
-
-    /**
+  
+        /**
      * Stops speech recognition.
      * 
      * @param {function} setIsListening - The state setter for listening status
@@ -126,7 +129,6 @@ class SpeechToTextHandler {
      * // speechToTextHandler.handleStopListening(setIsListening);
      * 
      */
-     * 
     handleStopListening(setIsListening) {
       console.log('handleStopListening invoked');
       this.stop()
@@ -137,12 +139,8 @@ class SpeechToTextHandler {
           console.error('Failed to stop speech recognition:', error);
         });
     }
-
-    /**
-     * Starts speech recognition.
-     */
-
-    
+  
+    // Start
     start(options = {}) {
       return new Promise((resolve, reject) => {
         if (!this.recognition) {
@@ -170,7 +168,8 @@ class SpeechToTextHandler {
         }
       });
     }
-  
+
+    // Stop
     stop() {
       return new Promise((resolve, reject) => {
         if (!this.recognition) {

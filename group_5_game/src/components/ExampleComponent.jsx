@@ -5,13 +5,6 @@ import { textToSpeechHandler } from './tSpeechHandler';
 import { speechToTextHandler } from './sTextHandler';
 
 
-/**
- * this can be used to test the speech to text and text to speech functionality
- * it can be deleted
- * @returns 
- */
-
-
 export default function ExampleComponent() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -89,15 +82,15 @@ export default function ExampleComponent() {
 
       <div>
         <button
-          className={'bg-green-500 text-white px-4 py-2 rounded mr-2'}
+          className={`bg-green-500 text-white px-4 py-2 rounded mr-2`}
           onClick={() => speechToTextHandler.handleStartListening(setTranscript, setIsListening)}
           disabled={isListening}
         >
-          Start Listening
+          Start Listvfvvening
         </button>
 
         <button
-          className={'bg-red-500 text-white px-4 py-2 rounded'}
+          className={`bg-red-500 text-white px-4 py-2 rounded`}
           onClick={() => speechToTextHandler.handleStopListening(setIsListening)}
 
         >

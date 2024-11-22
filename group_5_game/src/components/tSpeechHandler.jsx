@@ -1,5 +1,7 @@
+
 'use client';
 import React from 'react';
+
 /**
  * TextToSpeechHandler Class
  * to use this class, import it using the following code:
@@ -12,6 +14,8 @@ import React from 'react';
  * 
  * @class
  */
+
+
 class TextToSpeechHandler {
     constructor() {
       this.synthesis = typeof window !== 'undefined' ? window.speechSynthesis : null;
@@ -22,7 +26,7 @@ class TextToSpeechHandler {
       };
     }
 
-    /**  in most cases this can be used unless you want to customize the speech options
+      /**  in most cases this can be used unless you want to customize the speech options
      * Speaks text using default speech settings.
      * 
      * @param {string} text - The text to be spoken
@@ -31,7 +35,7 @@ class TextToSpeechHandler {
      * @example
      * textToSpeechHandler.say('Hello, world!')
      */
-  
+
     say(text) {
       return new Promise((resolve, reject) => {
         if (!this.synthesis) {
@@ -52,7 +56,9 @@ class TextToSpeechHandler {
         this.synthesis.speak(utterance);
       });
     }
-    /**
+
+
+      /**
      * Speaks text with customizable speech options.
      * 
      * @param {string} text - The text to be spoken
