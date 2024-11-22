@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
 import { useState } from 'react';
-import { textToSpeechHandler } from './tSpeechHandler';
-import { speechToTextHandler } from './sTextHandler';
+import { textToSpeechHandler } from './handlers/text_SpeechHandler';
+import { speechToTextHandler } from './handlers/speech_TextHandler';
 
 
 export default function ExampleComponent() {

@@ -21,7 +21,7 @@ Later in the game, players can view detailed statistics, including their best sc
 
 to use text to speech we are using the following library
 ```js
-import { textToSpeechHandler } from './tTextHandler';
+import { textToSpeechHandler } from './handlers/text_SpeechHandler';
 // and then use the following code to speak:
 textToSpeechHandler.say('Hello, world!') // to speak the text with default settings
 textToSpeechHandler.speak('Hello', { rate: 1.5, pitch: 1.2 }) // to speak the text with custom settings
@@ -32,7 +32,7 @@ textToSpeechHandler.speak('Hello', { rate: 1.5, pitch: 1.2 }) // to speak the te
 
 to use the speech to text we are using the following library
 ```js
-import { speechToTextHandler } from './speechHandler';
+mport { speechToTextHandler } from './handlers/speech_TextHandler';
 // and to use the speech to text function
 import { speechToTextHandler } from './sTextHandler';
 // and then use the following code to start listening:

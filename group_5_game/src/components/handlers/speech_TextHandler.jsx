@@ -6,7 +6,7 @@ import React from 'react';
 
 /**
  * to import this class, use the following code:
- *@import { speechToTextHandler } from './sTextHandler';
+ *@import { speechToTextHandler } from '../handlers/speech_TextHandler';
   * and then use the following code to start listening:
   * speechToTextHandler.handleStartListening(setTranscript, setIsListening); 
 */

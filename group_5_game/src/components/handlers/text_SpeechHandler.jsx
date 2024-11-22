@@ -5,7 +5,7 @@ import React from 'react';
 /**
  * TextToSpeechHandler Class
  * to use this class, import it using the following code:
- * @import { textToSpeechHandler } from './tSpeechHandler';
+ * @import { textToSpeechHandler } from '../handlers/text_SpeechHandler';
  * textToSpeechHandler.say('Hello, world!') // to speak the text with default settings
  * textToSpeechHandler.speak('Hello', { rate: 1.5, pitch: 1.2 }) // to speak the text with custom settings
  * A utility class that provides text-to-speech functionality using the Web Speech API.
