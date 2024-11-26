@@ -19,6 +19,28 @@ Later in the game, players can view detailed statistics, including their best sc
    ## **to be removed**
 
 
+to use text to speech we are using the following library
+```js
+import { textToSpeechHandler } from './handlers/text_SpeechHandler';
+// and then use the following code to speak:
+textToSpeechHandler.say('Hello, world!') // to speak the text with default settings
+textToSpeechHandler.speak('Hello', { rate: 1.5, pitch: 1.2 }) // to speak the text with custom settings
+```
+
+
+
+
+to use the speech to text we are using the following library
+```js
+mport { speechToTextHandler } from './handlers/speech_TextHandler';
+// and to use the speech to text function
+import { speechToTextHandler } from './sTextHandler';
+// and then use the following code to start listening:
+speechToTextHandler.handleStartListening(setTranscript, setIsListening); 
+
+
+
+
 ## Features
 1. User can start the game by saying “start”.
 2. User can pause the game by saying “pause”.
