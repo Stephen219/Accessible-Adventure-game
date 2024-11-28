@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import '@/components/css/Game.css';
 import { speechToTextHandler } from '@/components/handlers/speech_TextHandler';
-import { textToSpeechHandler } from '@/components/handlers/TextToSpeechHandler';
+import { textToSpeechHandler } from '@/components/handlers/text_SpeechHandler';
 import GameTranscript from '@/components/GameTranscript';
 
 /**
