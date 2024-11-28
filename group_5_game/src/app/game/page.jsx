@@ -1,7 +1,6 @@
 'use client';
 import React from 'react';
-import ExampleComponent from '/src/components/ExampleComponent';
-import Game from './Game';
+import Game from '@/components/Game.jsx';
 
 /**
  * game home page
@@ -11,9 +10,6 @@ import Game from './Game';
 export default function Home() {
   return (
     <div>
-      {/* /**
-      you  can delete this ExampleComponent tag if you want to   its just for testing
-       */ }
       <Game />
     </div>
   );
