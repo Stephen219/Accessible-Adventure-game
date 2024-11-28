@@ -20,15 +20,9 @@ body {
     color: #bb86fc; /* Accent color for the title */
 }
 
-.instruction {
+.instruction, .announcement {
     font-size: 1.2rem;
     margin: 10px 0;
-}
-
-.message {
-    font-size: 1.5rem;
-    color: #03dac6; /* Accent color for game text */
-    margin: 20px 0;
 }
 
 .listen-button {

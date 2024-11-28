@@ -43,14 +43,26 @@
     color: #4caf50; /* Green for user messages. */
 }
 
-/* Styling for system messages */
+/* Styling for system messages. */
 .transcript-line.system {
     color: #2196f3; /* Blue for system messages. */
+}
+
+/* Styling for the time. */
+.transcript-time {
+    color: #888888;
+    margin-right: 5px;
+}
+
+/* Styling for the type. */
+.transcript-type {
+    font-weight: bold;
+    margin-right: 5px;
 }
 
 /* Placeholder text when transcript is empty. */
 .transcript-placeholder {
     text-align: center;
-    color: #aaa; /* Subtle grey for placeholder */
+    color: #aaa; /* Subtle grey for placeholder. */
     font-style: italic;
 }
