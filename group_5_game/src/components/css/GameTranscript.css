@@ -1,0 +1,56 @@
+/* Wrapper for the entire transcript section. */
+.transcript-wrapper {
+    margin-top: 20px;
+}
+
+/* Header styling for the transcript. */
+.transcript-header {
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #ffffff;
+    text-align: left;
+}
+
+/* Scrollable container for transcript messages. */
+.transcript-container {
+    width: 600px;
+    height: 300px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #1e1e1e;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    text-align: left;
+    color: #ffffff;
+}
+
+/* Individual transcript lines. */
+.transcript-line {
+    margin: 0;
+    padding: 2px 0;
+}
+
+/* Styling for user messages. */
+.transcript-line.user {
+    color: #4caf50; /* Green for user messages. */
+}
+
+/* Styling for system messages */
+.transcript-line.system {
+    color: #2196f3; /* Blue for system messages. */
+}
+
+/* Placeholder text when transcript is empty. */
+.transcript-placeholder {
+    text-align: center;
+    color: #aaa; /* Subtle grey for placeholder */
+    font-style: italic;
+}
