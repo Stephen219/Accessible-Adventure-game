@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import ExampleComponent from '/src/components/ExampleComponent';
-import Game from './Game';
+import Game from '@/components/Game';
 
 /**
  * game home page
