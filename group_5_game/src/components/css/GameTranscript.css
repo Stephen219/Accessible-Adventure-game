@@ -1,6 +1,10 @@
 /* Wrapper for the entire transcript section. */
 .transcript-wrapper {
     margin-top: 20px;
+    width: 100%; /* Ensure it adapts to parent container */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* Header styling for the transcript. */
@@ -11,18 +15,19 @@
     margin-bottom: 10px;
     color: #ffffff;
     text-align: left;
+    width: 600px; /* Match container width */
 }
 
 /* Scrollable container for transcript messages. */
 .transcript-container {
-    width: 600px;
-    height: 300px;
-    margin-bottom: 20px;
+    width: 600px; /* Fixed width for consistency */
+    height: 300px; /* Fixed height */
     padding: 10px;
     border: 1px solid #555;
     border-radius: 5px;
     background-color: #1e1e1e;
     overflow-y: auto;
+    overflow-x: hidden; /* Prevent horizontal scroll */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
     font-family: Arial, sans-serif;
     font-size: 14px;
@@ -30,6 +35,24 @@
     white-space: pre-wrap;
     text-align: left;
     color: #ffffff;
+}
+
+
+.transcript-container::-webkit-scrollbar {
+    width: 8px; /* Adjust scrollbar width */
+}
+
+.transcript-container::-webkit-scrollbar-thumb {
+    background-color: #555; /* Thumb color */
+    border-radius: 5px; /* Rounded scrollbar edges */
+}
+
+.transcript-container::-webkit-scrollbar-thumb:hover {
+    background-color: #777; /* Lighter color on hover */
+}
+
+.transcript-container::-webkit-scrollbar-track {
+    background-color: #1e1e1e; /* Match background */
 }
 
 /* Individual transcript lines. */
@@ -66,8 +89,3 @@
     color: #aaa; /* Subtle grey for placeholder. */
     font-style: italic;
 }
-
-
-
-
-

@@ -9,7 +9,7 @@ const Scene2 = () => {
                 forming a thick canopy overhead. The air smells of moss and earth. Somewhere in the 
                 distance, you hear the faint rustle of leaves.
             </p>
-            <p>What will you do next? Say "go to Scene 1" to return to the crossroads or "go to Scene 3" to explore further.</p>
+            <p>What will you do next? Say go to Scene 1 to return to the crossroads or "go to Scene 3" to explore further.</p>
         </div>
     );
 };

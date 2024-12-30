@@ -1,16 +1,7 @@
 import React from 'react';
 
 const Scene1 = () => {
-    // return (
-    //     <div>
-    //         <h2>Scene 1: Crossroads</h2>
-    //         <p>
-    //             You are at a crossroads. The path to the left leads into a dark, dense forest. 
-    //             The path to the right winds up a gentle hill towards the light of a distant village.
-    //         </p>
-    //         <p>Where do you want to go? Say "go to Scene 2" to enter the forest or "go to Scene 3" to climb the hill.</p>
-    //     </div>
-    // );
+
     
     return (
         <div className="space-y-4">
