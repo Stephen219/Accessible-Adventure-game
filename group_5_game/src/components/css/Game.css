@@ -1,0 +1,49 @@
+/* General Game Container */
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #121212; /* Dark background */
+    color: #e0e0e0; /* Light text */
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+}
+
+.game-title {
+    font-size: 2.5rem;
+    color: #bb86fc; /* Accent color for the title */
+}
+
+.instruction, .announcement {
+    font-size: 1.2rem;
+    margin: 10px 0;
+}
+
+.listen-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #121212;
+    background-color: #bb86fc;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.listen-button:hover {
+    background-color: #3700b3;
+}
+
+.divider {
+    border: none; /* Remove the default border */
+    height: 1px; /* Set the thickness */
+    background: lightgrey; /* Light grey color */
+    margin: 10px; /* Add spacing between the <hr> and the header */
+    width: 90%; /* Make it span the container width */
+}
