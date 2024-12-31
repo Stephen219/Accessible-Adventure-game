@@ -1,6 +1,8 @@
 
 'use client';
 import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { textToSpeechHandler } from '../handlers/text_SpeechHandler';
 
 /**
  * TextToSpeechHandler Class
@@ -115,6 +117,61 @@ class TextToSpeechHandler {
     }
 
 
-}
+  export const textToSpeechHandler = new TextToSpeechHandler();
 
-export const textToSpeechHandler = new TextToSpeechHandler();
+
+const GameController = () => {
+  // Game status states: "stopped", "running"
+  const [gameStatus, setGameStatus] = useState('stopped');
+
+  useEffect(() => {
+    // Listen for voice commands
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = (event) => {
+      const command = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+      handleVoiceCommand(command);
+    };
+
+    recognition.start();
+
+    return () => {
+      recognition.stop();
+    };
+  }, []);
+
+  const handleVoiceCommand = (command) => {
+    switch (command) {
+      case 'start':
+        if (gameStatus === 'stopped') {
+          textToSpeechHandler.say('Game is starting');
+          setGameStatus('running');
+        }
+        break;
+      case 'stop':
+        if (gameStatus === 'running') {
+          textToSpeechHandler.say('Game is stopping');
+          setGameStatus('stopped');
+        }
+        break;
+      case 'restart':
+        textToSpeechHandler.say('Game is restarting');
+        setGameStatus('running');
+        break;
+      default:
+        console.log('Command not recognized:', command);
+    }
+  };
+
+  return (
+      <div>
+        <h1>Voice-Controlled Game</h1>
+        <p>Game Status: {gameStatus}</p>
+      </div>
+  );
+};
+
+export default GameController;
