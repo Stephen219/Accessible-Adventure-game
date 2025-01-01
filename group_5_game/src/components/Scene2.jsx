@@ -5,9 +5,7 @@ const Scene2 = () => {
         <div>
             <h2>Scene 2: Forest</h2>
             <p>
-                You find yourself in a shadowy forest. The trees are tall and ancient, their branches 
-                forming a thick canopy overhead. The air smells of moss and earth. Somewhere in the 
-                distance, you hear the faint rustle of leaves.
+            Oh no, I’m at a wide, rushing river. The current is so strong! I have a rope, a stick, a knife, and a matchstick. What can I use to cross? Help me, please!
             </p>
             <p>What will you do next? Say go to Scene 1 to return to the crossroads or "go to Scene 3" to explore further.</p>
         </div>

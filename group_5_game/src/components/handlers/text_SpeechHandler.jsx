@@ -1,8 +1,8 @@
 
 'use client';
-import React from 'react';
+// import React from 'react';
 import React, { useState, useEffect } from 'react';
-import { textToSpeechHandler } from '../handlers/text_SpeechHandler';
+// import { textToSpeechHandler } from '../handlers/text_SpeechHandler';
 
 /**
  * TextToSpeechHandler Class
@@ -116,62 +116,63 @@ class TextToSpeechHandler {
         if (this.synthesis) this.synthesis.cancel();
     }
 
+  }
 
   export const textToSpeechHandler = new TextToSpeechHandler();
 
 
-const GameController = () => {
-  // Game status states: "stopped", "running"
-  const [gameStatus, setGameStatus] = useState('stopped');
+// const GameController = () => {
+//   // Game status states: "stopped", "running"
+//   const [gameStatus, setGameStatus] = useState('stopped');
 
-  useEffect(() => {
-    // Listen for voice commands
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.continuous = true;
-    recognition.interimResults = false;
-    recognition.lang = 'en-US';
+//   useEffect(() => {
+//     // Listen for voice commands
+//     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+//     recognition.continuous = true;
+//     recognition.interimResults = false;
+//     recognition.lang = 'en-US';
 
-    recognition.onresult = (event) => {
-      const command = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
-      handleVoiceCommand(command);
-    };
+//     recognition.onresult = (event) => {
+//       const command = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+//       handleVoiceCommand(command);
+//     };
 
-    recognition.start();
+//     recognition.start();
 
-    return () => {
-      recognition.stop();
-    };
-  }, []);
+//     return () => {
+//       recognition.stop();
+//     };
+//   }, []);
 
-  const handleVoiceCommand = (command) => {
-    switch (command) {
-      case 'start':
-        if (gameStatus === 'stopped') {
-          textToSpeechHandler.say('Game is starting');
-          setGameStatus('running');
-        }
-        break;
-      case 'stop':
-        if (gameStatus === 'running') {
-          textToSpeechHandler.say('Game is stopping');
-          setGameStatus('stopped');
-        }
-        break;
-      case 'restart':
-        textToSpeechHandler.say('Game is restarting');
-        setGameStatus('running');
-        break;
-      default:
-        console.log('Command not recognized:', command);
-    }
-  };
+//   const handleVoiceCommand = (command) => {
+//     switch (command) {
+//       case 'start':
+//         if (gameStatus === 'stopped') {
+//           textToSpeechHandler.say('Game is starting');
+//           setGameStatus('running');
+//         }
+//         break;
+//       case 'stop':
+//         if (gameStatus === 'running') {
+//           textToSpeechHandler.say('Game is stopping');
+//           setGameStatus('stopped');
+//         }
+//         break;
+//       case 'restart':
+//         textToSpeechHandler.say('Game is restarting');
+//         setGameStatus('running');
+//         break;
+//       default:
+//         console.log('Command not recognized:', command);
+//     }
+//   };
 
-  return (
-      <div>
-        <h1>Voice-Controlled Game</h1>
-        <p>Game Status: {gameStatus}</p>
-      </div>
-  );
-};
+//   return (
+//       <div>
+//         <h1>Voice-Controlled Game</h1>
+//         <p>Game Status: {gameStatus}</p>
+//       </div>
+//   );
+// };
 
-export default GameController;
+// export default GameController;
