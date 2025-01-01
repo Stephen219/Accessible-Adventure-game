@@ -69,7 +69,7 @@ const Game = () => {
     await speechToTextHandler.handleStopListening({ setIsListening });
 
     updateTranscript('System', message);
-    console.log('Systhuhuhem:   delete me', message); // FIX ME: Delete this line
+    console.log('SysthuVFVhuhem:   delete me', message); // FIX ME: Delete this line
 
     setIsSpeaking(true);
 
