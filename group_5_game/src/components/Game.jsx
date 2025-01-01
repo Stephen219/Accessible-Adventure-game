@@ -5,6 +5,7 @@ import '@/components/css/Game.css';
 import { speechToTextHandler } from '@/components/handlers/speech_TextHandler';
 import { textToSpeechHandler } from '@/components/handlers/text_SpeechHandler';
 import GameTranscript from '@/components/GameTranscript';
+import Inventory from '@/components/Inventory';
 
 /**
  * Game Component
@@ -21,7 +22,7 @@ const Game = () => {
     const [isListening, setIsListening] = useState(false); // Tracks if speech recognition is active.
     const [transcript, setTranscript] = useState([]);
     const [announcement, setAnnouncement] = useState(''); // Tracks the current announcement.
-
+    const [inventory, setInventory] = useState(['Knife', 'Stick']); // Example initial inventory
     // Ref to keep track of the current gameStarted state.
     const gameStartedRef = useRef(gameStarted);
 
@@ -108,8 +109,17 @@ const Game = () => {
             } else {
                 handleSystemMessage('The game has already started.');
             }
+        } else if (trimmedText.toLowerCase().includes('use')) {
+        const itemToUse = trimmedText.split('use ')[1]?.trim();
+        if (inventory.includes(itemToUse)) {
+            handleSystemMessage(`You used the ${itemToUse}.`);
+            setInventory(inventory.filter((item) => item !== itemToUse));
+        } else {
+            handleSystemMessage(`You don't have a ${itemToUse} in your inventory.`);
         }
-    };
+    }
+
+};
 
     /**
      * Toggles speech recognition on or off based on the current listening state.
@@ -146,6 +156,9 @@ const Game = () => {
                 {isListening ? 'Stop Listening' : 'Start Listening'}
             </button>
             <hr className="divider" />
+
+            {/* Inventory Component */}
+            <Inventory />
 
             {/* Component to display the game's transcript. */}
             <GameTranscript transcript={transcript} />
