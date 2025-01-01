@@ -17,7 +17,7 @@ import GameTranscript from '@/components/GameTranscript';
 
 const Game = () => {
   const [gameStarted, setGameStarted] = useState(false);
-  const [currentScene, setCurrentScene] = useState(1);
+  let [currentScene, setCurrentScene] = useState(1);
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false); // Track audio playing state
@@ -60,27 +60,32 @@ const Game = () => {
    * @param {boolean} [isAnnouncement=false] - Indicates if the message is an important announcement.
    */
 
+
+
   const handleSystemMessage = async (message) => {
     // Ensure mic is off during system response
-    speechToTextHandler.handleStopListening({ setIsListening });
+    await speechToTextHandler.handleStopListening({ setIsListening });
 
     updateTranscript('System', message);
 
     setIsSpeaking(true);
 
     try {
-      // Speak the system message
-      await textToSpeechHandler.speak(message);
+        // Speak the system message
+        await textToSpeechHandler.speak(message);
     } finally {
-      setIsSpeaking(false);
+        setIsSpeaking(false);
 
-      // Resume speech recognition after system response
-      speechToTextHandler.handleStartListening({
-        onResult: handleUserSpeech,
-        setIsListening,
-      });
+        // Resume speech recognition only if no audio is playing
+        if (!isAudioPlaying) {
+            speechToTextHandler.handleStartListening({
+                onResult: handleUserSpeech,
+                setIsListening,
+            });
+        }
     }
-  };
+};
+
 
   /**
    * Processes the recognized speech input from the user.
@@ -101,29 +106,74 @@ const Game = () => {
       handleSystemMessage('The game has started. ' + getSceneDescription(1));
     } else if (gameStartedRef.current) {
       if (trimmedText.includes('where')) {
+        console.log('Current scene:', currentScene);
+      
         // Respond with the current scene description
         handleSystemMessage(getSceneDescription(currentScene));
       } else if (trimmedText.includes('go to') && currentScene === 1) {
+      
+        setCurrentScene(2);  // Transition to scene 2
+        currentScene = 2;
+        console.log('Transitioning to scene 2');
+        playAudioAndTransition(2);
+      } else if (trimmedText.includes('yes') && currentScene === 2) {
+        console.log('Transitioning to scene 3');
+        // if (isAudioPlaying) return; // Prevent duplicate audio playback
+        // setCurrentScene(3);
+        // handleSystemMessage(getSceneDescription(3));
+        setCurrentScene(3);  // Transition to scene 2
+        currentScene = 3;
+        console.log('Transitioning to scene 2');
+        playAudioAndTransition(3);
+      } else if (trimmedText.toLowerCase().includes('number') && currentScene === 3) {
         if (isAudioPlaying) return; // Prevent duplicate audio playback
+        setCurrentScene(1);  // Transition to scene 2
+        currentScene = 1;
+        console.log('Transitioning to scene 1');
+        console.log('Current scene:', currentScene);
 
-        setCurrentScene(2);
-        playSceneAudio(2, () => {
-          handleSystemMessage(getSceneDescription(2));
-        });
-      } else if (trimmedText.includes('go to scene 3') && currentScene === 2) {
-        if (isAudioPlaying) return; // Prevent duplicate audio playback
-        setCurrentScene(3);
-        handleSystemMessage(getSceneDescription(3));
-      } else if (trimmedText.includes('go to scene 1') && currentScene === 3) {
-        if (isAudioPlaying) return; // Prevent duplicate audio playback
-        setCurrentScene(1);
-        handleSystemMessage(getSceneDescription(1));
       } else {
         handleSystemMessage('Command not recognized. Please repeat.');
       }
     }
   };
 
+
+
+  const playAudioAndTransition = (sceneNumber) => {
+    const audioMap = {
+      2: '/walking.mp3',
+      3: '/transition3.mp3', // Example for scene 3 audio
+    };
+  
+    const audioSrc = audioMap[sceneNumber];
+    if (audioSrc && !isAudioPlaying) {
+      // Ensure mic is off during audio playback
+      speechToTextHandler.handleStopListening({ setIsListening });
+  
+      const audio = new Audio(audioSrc);
+  
+      setIsAudioPlaying(true); // Set audio playing state to true
+  
+      audio.play().catch((err) => console.error('Audio playback error:', err));
+  
+      audio.onended = async () => {
+        setIsAudioPlaying(false); // Reset audio playing state
+        // When audio finishes, handle the next steps
+        if (sceneNumber === 2) {
+          await handleSystemMessage(getSceneDescription(2)); // Announce Scene 2 after audio
+        } else if (sceneNumber === 3) {
+          await handleSystemMessage(getSceneDescription(3)); // Announce Scene 3 after audio
+        }
+        // Start listening again after audio finishes
+        speechToTextHandler.handleStartListening({
+          onResult: handleUserSpeech,
+          setIsListening,
+        });
+      };
+    }
+  };
+  
   /**
    * Toggles speech recognition on or off based on the current listening state.
    *
@@ -143,50 +193,7 @@ const Game = () => {
     }
   };
 
-  const playSceneAudio = (sceneNumber, onComplete) => {
-    const audioMap = {
-      2: '/walking.mp3',
-    };
-
-    const audioSrc = audioMap[sceneNumber];
-    if (audioSrc && !isAudioPlaying) {
-      // Check if audio is already playing
-      // Ensure mic is off during audio playback
-      speechToTextHandler.handleStopListening({ setIsListening });
-
-      const audio = new Audio(audioSrc);
-      audio.play().catch((err) => console.error('Audio playback error:', err));
-
-      // Set the audio playing state to true
-      setIsAudioPlaying(true);
-
-      // Call onComplete after audio finishes
-      audio.onended = () => {
-        if (onComplete) onComplete();
-        setIsAudioPlaying(false); // Reset audio playing state after the audio ends
-        // Start listening again after audio finishes
-        speechToTextHandler.handleStartListening({
-          onResult: handleUserSpeech,
-          setIsListening,
-        });
-      };
-
-      // Fallback to ensure completion after 30 seconds
-      setTimeout(() => {
-        if (onComplete) onComplete();
-        setIsAudioPlaying(false); // Reset audio playing state after 30 seconds
-        // Start listening again after timeout
-        speechToTextHandler.handleStartListening({
-          onResult: handleUserSpeech,
-          setIsListening,
-        });
-      }, 30000);
-    } else if (onComplete) {
-      // If no audio found, directly call onComplete
-      onComplete();
-    }
-  };
-
+  
   const getSceneDescription = (sceneNumber) => {
     switch (sceneNumber) {
       case 1:
@@ -215,14 +222,14 @@ const Game = () => {
           Adventure Game
         </h1>
 
-        <button
+        {/* <button
           onClick={() =>
             playSceneAudio(2, () => console.log('Audio playback completed'))
           }
           className="bg-purple-600 hover:bg-purple-700 transition-colors text-white font-semibold px-6 py-3 rounded-lg shadow-md text-lg mb-4"
         >
           Test Audio
-        </button>
+        </button> */}
 
         {!gameStarted ? (
           <p className="text-gray-300 text-lg italic">
