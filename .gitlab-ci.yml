@@ -77,11 +77,11 @@ dev:
   stage: dev
   script:
     - echo "Installing dependencies..."
-    - cd my-app
+    - cd group_5_game
     - npm ci
     - echo "Starting development server..."
     - npm run dev &
-    - sleep 10
+    - sleep 40
     - echo "Checking if server is running..."
     # Test if the server is running by making an HTTP request
     - curl --silent --fail http://localhost:3000 || { echo "Dev server not running"; exit 1; }
