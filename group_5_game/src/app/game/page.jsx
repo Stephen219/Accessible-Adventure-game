@@ -1,20 +1,12 @@
 'use client';
 import React from 'react';
-
-
 import ExampleComponent from '/src/components/ExampleComponent';
-/**
- * game home page
- * @returns  home page
- */
+import Game from '/src/components/Game';
 
-export default function Home() {
+export default function GamePage() {
   return (
-    <div>
-      {/* /**
-      you  can delete this ExampleComponent tag if you want to   its just for testing
-       */ }
-      <ExampleComponent />
-    </div>
+    <>
+      <Game></Game>
+    </>
   );
 }
