@@ -77,7 +77,7 @@ dev:
   stage: dev
   script:
     - echo "Installing dependencies..."
-    - cd my-app
+    - cd group_5_game
     - npm ci
     - echo "Starting development server..."
     - npm run dev &
