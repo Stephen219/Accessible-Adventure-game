@@ -7,6 +7,9 @@
  * This handler manages voice recognition, transcription, and related state.
  *
  * @class
+ * 
+ * 
+ * 
  * @example
  * // Import the handler.
  * import { speechToTextHandler } from '../handlers/speech_TextHandler';
