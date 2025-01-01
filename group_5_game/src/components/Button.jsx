@@ -4,7 +4,10 @@ import React from 'react';
  * A reusable button component with default styles
  * 
  * 
- * @param {*} param0 
+ * 
+ * 
+ * @param {* children, onClick, className, disabled
+ * } param0 
  * @returns 
  */
 
