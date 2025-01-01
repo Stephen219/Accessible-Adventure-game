@@ -1,9 +1,11 @@
 'use client';
+
 import React, { useState } from 'react';
+import { textToSpeechHandler } from '@/components/handlers/text_SpeechHandler';
 
 const Inventory = () => {
-    const [inventory, setInventory] = useState([]);
-    const availableItems = ['Knife', 'Stick', 'Rock']; //example available items
+    const [inventory, setInventory] = useState(['Knife', 'Stick', 'Rock']);
+    const availableItems = ['Knife', 'Stick', 'Rock'];
 
     const addItemToInventory = (item) => {
         if (!inventory.includes(item)) {
@@ -13,6 +15,15 @@ const Inventory = () => {
 
     const removeItemFromInventory = (item) => {
         setInventory(inventory.filter((invItem) => invItem !== item));
+    };
+
+    const speakInventory = () => {
+        if (inventory.length > 0) {
+            const itemsList = inventory.join(', ');
+            textToSpeechHandler.speak(`You have the following items: ${itemsList}`);
+        } else {
+            textToSpeechHandler.speak('Your inventory is empty.');
+        }
     };
 
     return (
@@ -45,6 +56,9 @@ const Inventory = () => {
                     <p>Your inventory is empty.</p>
                 )}
             </div>
+
+            {/* Button to trigger text-to-speech */}
+            <button onClick={speakInventory}>Tell me my inventory</button>
         </div>
     );
 };

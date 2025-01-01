@@ -109,13 +109,20 @@ const Game = () => {
             } else {
                 handleSystemMessage('The game has already started.');
             }
-        } else if (trimmedText.toLowerCase().includes('use')) {
+        }  else if (trimmedText.toLowerCase().includes('use')) {
         const itemToUse = trimmedText.split('use ')[1]?.trim();
         if (inventory.includes(itemToUse)) {
             handleSystemMessage(`You used the ${itemToUse}.`);
             setInventory(inventory.filter((item) => item !== itemToUse));
         } else {
             handleSystemMessage(`You don't have a ${itemToUse} in your inventory.`);
+        }
+    } else if (trimmedText.toLowerCase().includes('what items do i have')) {
+        if (inventory.length > 0) {
+            const itemsList = inventory.join(', ');
+            handleSystemMessage(`You have the following items: ${itemsList}.`);
+        } else {
+            handleSystemMessage('Your inventory is empty.');
         }
     }
 
