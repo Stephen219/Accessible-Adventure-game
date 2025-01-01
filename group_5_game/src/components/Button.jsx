@@ -1,4 +1,16 @@
 import React from 'react';
+/**
+ * Button Component
+ * A reusable button component with default styles
+ * 
+ * 
+ * 
+ * 
+ * @param {* childregggn, onClick, className, disabled
+ * } param0 
+ * @returns 
+ * @example
+ */
 
 const Button = ({ children, onClick, className = '', disabled = false }) => {
   return (
