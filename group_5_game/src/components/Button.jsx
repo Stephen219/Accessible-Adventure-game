@@ -6,7 +6,7 @@ import React from 'react';
  * 
  * 
  * 
- * @param {* children, onClick, className, disabled
+ * @param {* childregggn, onClick, className, disabled
  * } param0 
  * @returns 
  * @example
