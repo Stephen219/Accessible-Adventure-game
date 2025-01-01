@@ -26,7 +26,7 @@ lint:
     - npm ci
     - echo "Running lint..."
     - npm run lint --fix
-    - npm run lint -- --max-warnings=1000 --max-errors=1000 || true  # Allow up to 1000 warnings and errors and automatically pass
+    - npm run lint -- --max-warnings=1000 --max-errors=1000 || true  # Allow up to 1000 warnings and errors and automatically pass   THIS HAS TO BE CHANGIND IN PRODUCTION
   rules:
     # Only run this on merge requests targeting `development` or `main` branch
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
@@ -81,7 +81,7 @@ dev:
     - npm ci
     - echo "Starting development server..."
     - npm run dev &
-    - sleep 10
+    - sleep 40
     - echo "Checking if server is running..."
     # Test if the server is running by making an HTTP request
     # - curl --silent --fail http://localhost:3000 || { echo "Dev server not running"; exit 1; }
@@ -105,6 +105,5 @@ deploy:
     - if: '$CI_COMMIT_BRANCH == "main"'
   environment:
     name: production
-    url: https://your-vercel-project-name.vercel.app
-
+    
 
