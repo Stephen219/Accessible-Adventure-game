@@ -117,10 +117,13 @@ class TextToSpeechHandler {
     }
 
 
-  export const textToSpeechHandler = new TextToSpeechHandler();
+  export
+    const
+    textToSpeechHandler = new TextToSpeechHandler();
 
 
-const GameController = () => {
+const
+    GameController = () => {
   // Game status states: "stopped", "running"
   const [gameStatus, setGameStatus] = useState('stopped');
 
@@ -174,4 +177,7 @@ const GameController = () => {
   );
 };
 
-export default GameController;
+export
+    default
+    GameController;}
+
