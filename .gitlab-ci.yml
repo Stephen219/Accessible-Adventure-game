@@ -1,0 +1,106 @@
+
+default:
+  tags:
+    - comsc-ci
+image: node:20-alpine
+
+stages:
+  - lint
+  - test
+  - build
+  - deploy
+
+variables:
+  CI_DEBUG_TRACE: "false"
+
+# 1. Linting stage
+lint:
+  stage: lint
+  script:
+    - echo "Installing dependencies..."
+    - pwd
+    - ls -la
+    - cd group_5_game
+    - ls -la
+    - npm ci
+    - echo "Running lint..."
+    - npm run lint
+  rules:
+    # Only run this on merge requests targeting `development` or `main` branch
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - group_5_game/**/*
+
+# 2. Testing stage
+test:
+  stage: test
+  script:
+    - echo "Installing dependencies..."
+    - cd group_5_game
+    - npm ci
+    - echo "Running tests..."
+    - npm run test
+  artifacts:
+    paths:
+      - test-reports/
+    expire_in: 1 week
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - group_5_game/**/*
+
+# 3. Build stage
+build:
+  stage: build
+  script:
+    - echo "Running build..."
+    - cd group_5_game
+    - npm ci
+    - npm run build
+  artifacts:
+    paths:
+      - .next/
+    expire_in: 1 week
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - group_5_game/**/*
+
+
+
+
+
+# 4. Dev server check stage
+dev:
+  stage: dev
+  script:
+    - echo "Installing dependencies..."
+    - cd my-app
+    - npm ci
+    - echo "Starting development server..."
+    - npm run dev &
+    - sleep 10
+    - echo "Checking if server is running..."
+    # Test if the server is running by making an HTTP request
+    - curl --silent --fail http://localhost:3000 || { echo "Dev server not running"; exit 1; }
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - group_5_game/**/*
+
+
+# 5. ideall this is not currently functional    not deploying anyway
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying to Vercel..."
+    - cd my-app
+    - npm install -g vercel
+    - vercel --prod --token $VERCEL_TOKEN --confirm
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  environment:
+    name: production
+    url: https://your-vercel-project-name.vercel.app
+
+
