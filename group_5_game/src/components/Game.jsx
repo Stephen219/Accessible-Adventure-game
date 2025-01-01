@@ -109,6 +109,24 @@ const Game = () => {
                 handleSystemMessage('The game has already started.');
             }
         }
+        // Stop the game
+        else if (trimmedText.toLowerCase().includes('stop game')) {
+            if (gameStartedRef.current) {
+                setGameStarted(false);
+                handleSystemMessage('The game has been stopped.', true);
+            } else {
+                handleSystemMessage('The game is not currently running.');
+            }
+        }
+        // Restart the game
+        else if (trimmedText.toLowerCase().includes('restart game')) {
+            if (gameStartedRef.current) {
+                handleSystemMessage('Restarting the game.', true);
+            } else {
+                handleSystemMessage('Starting the game.', true);
+            }
+            setGameStarted(true);
+        }
     };
 
     /**
@@ -137,7 +155,8 @@ const Game = () => {
                 <p className="announcement">{announcement}</p>
             ) : (
                 <p className="instruction">
-                    Say <strong>&quot;start game&quot;</strong> to begin the game.
+                    Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>, or <strong>&quot;restart game&quot;</strong>.
+
                 </p>
             )}
 
