@@ -9,6 +9,7 @@ stages:
   - test
   - build
   - deploy
+  - dev
 
 variables:
   CI_DEBUG_TRACE: "false"
@@ -101,6 +102,5 @@ deploy:
     - if: '$CI_COMMIT_BRANCH == "main"'
   environment:
     name: production
-    url: https://your-vercel-project-name.vercel.app
-
+    
 
