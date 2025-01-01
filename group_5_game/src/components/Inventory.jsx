@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import '@/components/css/Inventory.css';
 import { textToSpeechHandler } from '@/components/handlers/text_SpeechHandler';
 
 const Inventory = () => {
