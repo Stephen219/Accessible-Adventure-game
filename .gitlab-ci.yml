@@ -84,7 +84,9 @@ dev:
     - sleep 40
     - echo "Checking if server is running..."
     # Test if the server is running by making an HTTP request
-    - curl --silent --fail http://localhost:3000 || { echo "Dev server not running"; exit 1; }
+    # - curl --silent --fail http://localhost:3000 || { echo "Dev server not running"; exit 1; }
+    - wget --spider --quiet http://localhost:3000 || { echo "Dev server not running"; exit 1; }
+    - echo "Checking if server is running..."
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
