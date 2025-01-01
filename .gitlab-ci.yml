@@ -9,6 +9,7 @@ stages:
   - test
   - build
   - deploy
+  - dev
 
 variables:
   CI_DEBUG_TRACE: "false"
