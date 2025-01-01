@@ -9,6 +9,7 @@ import React from 'react';
  * @param {* children, onClick, className, disabled
  * } param0 
  * @returns 
+ * @example
  */
 
 const Button = ({ children, onClick, className = '', disabled = false }) => {
