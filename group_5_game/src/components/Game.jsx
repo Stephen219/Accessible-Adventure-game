@@ -18,6 +18,8 @@ import GameTranscript from '@/components/GameTranscript';
  */
 
 const Game = () => {
+  let [speechRate, setSpeechRate] = useState(1); // Default speech rate
+
   const [gameStarted, setGameStarted] = useState(false);
   let [currentScene, setCurrentScene] = useState(1);
   const [isListening, setIsListening] = useState(false);
@@ -51,6 +53,18 @@ const Game = () => {
     ]);
   };
 
+
+  const increaseSpeechRate = () => {
+    setSpeechRate((prevRate) => Math.min(prevRate + 0.7, 4.0)); // Cap at 2.0
+    console.log('Speech rate increased to:', speechRate);
+  };
+  
+  const decreaseSpeechRate = () => {
+    setSpeechRate((prevRate) => Math.max(prevRate - 0.1, 0.5)); // Minimum 0.5
+    console.log('Speech rate decreased to:', speechRate);
+  };
+  
+
   /**
    * Handles a system-generated message by speaking it aloud and updating the transcript.
    *
@@ -75,7 +89,8 @@ const Game = () => {
 
     try {
         // Speak the system message
-        await textToSpeechHandler.speak(message);
+        // await textToSpeechHandler.speak(message);
+        await textToSpeechHandler.speak(message, { rate: speechRate });
     } finally {
         setIsSpeaking(false);
 
@@ -108,7 +123,14 @@ const Game = () => {
       setGameStarted(true);
       handleSystemMessage('The game has started. ' + getSceneDescription(1));
     } else if (gameStartedRef.current) {
-      if (trimmedText.includes('where')) {
+      if (trimmedText.includes('go faster')) {
+        increaseSpeechRate();
+        handleSystemMessage('Speaking faster.');
+      } else if (trimmedText.includes('go slower')) {
+        decreaseSpeechRate();
+        handleSystemMessage('Speaking slower.');
+
+      }else if (trimmedText.includes('where')) {
         console.log('Current scene:', currentScene);
       
         // Respond with the current scene description
