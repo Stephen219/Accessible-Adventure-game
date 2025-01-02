@@ -5,7 +5,7 @@ import { createContext, useContext, useState } from "react";
 const SettingsContext = createContext();
 
 export function SettingsProvider({ children }) {
-    const [speechVolume, setSpeechVolume] = useState(50);
+    const [speechVolume, setSpeechVolume] = useState(100);
 
     return (
         <SettingsContext.Provider

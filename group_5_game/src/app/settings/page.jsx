@@ -1,13 +1,17 @@
 'use client';
 import React from 'react';
 import { useSettings } from '../../context/SettingsContext';
+import {textToSpeechHandler} from "@/components/handlers/text_SpeechHandler";
 
 export default function Page() {
     const { settings, setSpeechVolume } = useSettings();
 
     const handleSpeechVolumeChange = (value) => {
         setSpeechVolume(value); // Update the volume directly
-    };
+        textToSpeechHandler.speak("Volume set to " + value + " percent", {
+            volume: value / 100
+        });
+        };
 
     return (
         <div>
