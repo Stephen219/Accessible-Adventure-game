@@ -1,8 +1,8 @@
 'use client';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { auth } from '../utils/firebaseConfig'; // Ensure the path is correct
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+// import { auth } from '../utils/firebaseConfig'; // Ensure the path is correct
+// import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 
 export default function Home() {
   const router = useRouter();
@@ -21,8 +21,8 @@ export default function Home() {
     router.push('/game'); // Redirect to game page
   };
 
-  // Create Account Handler
-  const handleCreateAccount = async (e) => {
+  // Create Account Handler (Mocked with Firebase Functionality Commented Out)
+  const handleCreateAccount = (e) => {
     e.preventDefault();
     setError('');
 
@@ -31,34 +31,51 @@ export default function Home() {
       return;
     }
 
+    // Uncomment this block to enable Firebase functionality
+    /*
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       console.log('User created:', user);
-
       alert('Account created successfully! Please log in.');
       setCreateAccountModalOpen(false); // Close the modal
     } catch (error) {
       console.error('Error creating account:', error.message);
       setError(error.message || 'Failed to create account. Please try again.');
     }
+    */
+
+    // Mocked Logic for Testing
+    console.log(`Mock account created for ${email}`);
+    alert('Account created successfully! Please log in.');
+    setCreateAccountModalOpen(false); // Close the modal
   };
 
-  // Login Handler
-  const handleLogin = async (e) => {
+  // Login Handler (Mocked with Firebase Functionality Commented Out)
+  const handleLogin = (e) => {
     e.preventDefault();
     setError('');
 
+    // Uncomment this block to enable Firebase functionality
+    /*
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       console.log('Logged in user:', user);
-
       alert(`Welcome back, ${user.email}!`);
       router.push('/game'); // Redirect to game page
     } catch (error) {
       console.error('Error logging in:', error.message);
       setError(error.message || 'Invalid email or password.');
+    }
+    */
+
+    // Mocked Logic for Testing
+    if (email === 'testuser@example.com' && password === 'testpassword') {
+      alert('Login successful!');
+      router.push('/game'); // Redirect to game page
+    } else {
+      setError('Invalid email or password.');
     }
   };
 
@@ -269,3 +286,29 @@ const inputStyle = {
   padding: '10px',
   fontSize: '16px',
 };
+
+
+
+
+// testing the connection
+// 'use client';
+// import React, { useEffect } from 'react';
+// import { auth } from '../utils/firebaseConfig'; // Ensure the path is correct
+// import { getAuth } from 'firebase/auth';
+
+// export default function FirebaseTest() {
+//   useEffect(() => {
+//     try {
+//       const testAuth = getAuth();
+//       console.log('Firebase is connected:', testAuth);
+//     } catch (error) {
+//       console.error('Firebase connection error:', error.message);
+//     }
+//   }, []);
+
+//   return (
+//     <div>
+//       <h1>Testing Firebase Connection</h1>
+//     </div>
+//   );
+// }
