@@ -28,7 +28,8 @@ const Game = () => {
     const [isAudioPlaying, setIsAudioPlaying] = useState(false); // Track audio playing state
     const [transcript, setTranscript] = useState([]);
     const [announcement, setAnnouncement] = useState('');
-    const [Inventory, setInventory] = useState(['Knife', 'Stick']); // Example inventory
+    const [InventoryList, setInventoryList] = useState(['Knife', 'Stick']);
+
     // Ref to keep track of the current gameStarted state.
     const gameStartedRef = useRef(gameStarted);
 
@@ -264,7 +265,7 @@ const Game = () => {
             <hr className="divider"/>
 
             {/* Inventory Component */}
-            <Inventory/>
+            <InventoryList/>
 
             {/* Component to display the game's transcript */}
             <GameTranscript transcript={transcript}/>
