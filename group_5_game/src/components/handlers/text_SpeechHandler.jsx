@@ -117,7 +117,7 @@ class TextToSpeechHandler {
     }
 
 
-  export
+    export
     const
-    textToSpeechHandler = new TextToSpeechHandler(); }
+    textToSpeechHandler = new TextToSpeechHandler();
 
