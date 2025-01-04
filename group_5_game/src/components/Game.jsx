@@ -19,14 +19,21 @@ import Inventory from '@/components/Inventory';
  */
 
 const Game = () => {
-    // State variables for game status, listening state, transcript, and announcement message.
-    const [gameStarted, setGameStarted] = useState(false);
-    const [isListening, setIsListening] = useState(false); // Tracks if speech recognition is active.
-    const [transcript, setTranscript] = useState([]);
+
+  let [speechRate, setSpeechRate] = useState(1); // Default speech rate
+
+  const [gameStarted, setGameStarted] = useState(false);
+  let [currentScene, setCurrentScene] = useState(1);
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false); // Track audio playing state
+  const [transcript, setTranscript] = useState([]);
     const [announcement, setAnnouncement] = useState(''); // Tracks the current announcement.
     const [inventory, setInventory] = useState(['Knife', 'Stick']); // Example initial inventory
-    // Ref to keep track of the current gameStarted state.
-    const gameStartedRef = useRef(gameStarted);
+  // Ref to keep track of the current gameStarted state.
+  const gameStartedRef = useRef(gameStarted);
+
+   
 
     useEffect(() => {
         gameStartedRef.current = gameStarted;
@@ -42,14 +49,38 @@ const Game = () => {
      * @param {string} text - The text to add to the transcript.
      */
 
-    const updateTranscript = (type, text) => {
-        const currentTime = new Date().toLocaleTimeString([], {hour12: false});
-        setTranscript((prev) => [
-            ...prev,
-            {type, text: text.trim(), time: currentTime},
-        ]);
-    };
+    
 
+  const updateTranscript = (type, text) => {
+    const currentTime = new Date().toLocaleTimeString([], { hour12: false });
+    setTranscript((prev) => [
+      ...prev,
+      { type, text: text.trim(), time: currentTime },
+    ]);
+  };
+
+
+  const increaseSpeechRate = () => {
+    setSpeechRate((prevRate) => Math.min(prevRate + 0.7, 4.0)); // Cap at 2.0
+    console.log('Speech rate increased to:', speechRate);
+  };
+  
+  const decreaseSpeechRate = () => {
+    setSpeechRate((prevRate) => Math.max(prevRate - 0.1, 0.5)); // Minimum 0.5
+    console.log('Speech rate decreased to:', speechRate);
+  };
+  
+
+  /**
+   * Handles a system-generated message by speaking it aloud and updating the transcript.
+   *
+   * This function stops speech recognition to avoid conflicts, adds the system message to the transcript,
+   * updates the announcement message if it's an announcement, uses text-to-speech to speak the message,
+   * and then resumes speech recognition after speaking.
+   *
+   * @param {string} message - The system message to process.
+   * @param {boolean} [isAnnouncement=false] - Indicates if the message is an important announcement.
+   */
     /**
      * Handles a system-generated message by speaking it aloud and updating the transcript.
      *
@@ -72,11 +103,12 @@ const Game = () => {
 
         setIsSpeaking(true);
 
-        try {
-            // Speak the system message
-            await textToSpeechHandler.speak(message);
-        } finally {
-            setIsSpeaking(false);
+    try {
+        // Speak the system message
+        // await textToSpeechHandler.speak(message);
+        await textToSpeechHandler.speak(message, { rate: speechRate });
+    } finally {
+        setIsSpeaking(false);
 
             // Resume speech recognition only if no audio is playing
             if (!isAudioPlaying) {
@@ -250,6 +282,74 @@ const Game = () => {
         } else {
             speechToTextHandler.handleStopListening({setIsListening});
         }
+    }
+};
+
+
+  /**
+   * Processes the recognized speech input from the user.
+   *
+   * This function trims the input text, updates the transcript with the user's input,
+   * and checks if the user has issued a command to start the game.
+   *
+   * @param {string} text - The recognized speech text.
+   */
+
+  const handleUserSpeech = (text) => {
+    const trimmedText = text.trim().toLowerCase();
+
+    updateTranscript('User', text);
+
+    if (!gameStartedRef.current && trimmedText.includes('start game')) {
+      setGameStarted(true);
+      handleSystemMessage('The game has started. ' + getSceneDescription(1));
+    } else if (gameStartedRef.current) {
+      if (trimmedText.includes('go faster')) {
+        increaseSpeechRate();
+        handleSystemMessage('Speaking faster.');
+      } else if (trimmedText.includes('go slower')) {
+        decreaseSpeechRate();
+        handleSystemMessage('Speaking slower.');
+
+      }else if (trimmedText.includes('where')) {
+        console.log('Current scene:', currentScene);
+      
+        // Respond with the current scene description
+        handleSystemMessage(getSceneDescription(currentScene));
+      } else if (trimmedText.includes('go to') && currentScene === 1) {
+      
+        setCurrentScene(2);  // Transition to scene 2
+        currentScene = 2;
+        console.log('Transitioning to scene 2');
+        playAudioAndTransition(2);
+      } else if (trimmedText.includes('yes') && currentScene === 2) {
+        console.log('Transitioning to scene 3');
+        // if (isAudioPlaying) return; // Prevent duplicate audio playback
+        // setCurrentScene(3);
+        // handleSystemMessage(getSceneDescription(3));
+        setCurrentScene(3);  // Transition to scene 2
+        currentScene = 3;
+        console.log('Transitioning to scene 2');
+        playAudioAndTransition(3);
+      } else if (trimmedText.toLowerCase().includes('number') && currentScene === 3) {
+        if (isAudioPlaying) return; // Prevent duplicate audio playback
+        setCurrentScene(1);  // Transition to scene 2
+        currentScene = 1;
+        console.log('Transitioning to scene 1');
+        console.log('Current scene:', currentScene);
+
+      } else {
+        handleSystemMessage('Command not recognized. Please repeat.');
+      }
+    }
+  };
+
+
+
+  const playAudioAndTransition = (sceneNumber) => {
+    const audioMap = {
+      2: '/walking.mp3',
+      3: '/transition3.mp3', // Example for scene 3 audio
     };
 
 
@@ -257,7 +357,7 @@ const Game = () => {
     }
     {
         announcement ? (
-            <p className="announcement">{announcement}</p>
+          <p className="announcement">{announcement}</p>
         ) : (
             <p className="instruction">
                 Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>,
@@ -326,11 +426,13 @@ const Game = () => {
 
         {/* Button to Start or Stop Listening */}
         <button
-            onClick={startListening}
-            className={`mt-6 ${
-                isListening ? 'bg-red-600 hover:bg-red-700' : 'bg-purple-600 hover:bg-purple-700'
-            } transition-colors text-white font-semibold px-6 py-3 rounded-lg shadow-md text-lg`}
-            disabled={isSpeaking || isAudioPlaying} // Disable listening when audio is playing
+          onClick={startListening}
+          className={`mt-6 bg-${
+            isListening ? 'red-600' : 'purple-600'
+          } hover:bg-${
+            isListening ? 'red-700' : 'purple-700'
+          } transition-colors text-white font-semibold px-6 py-3 rounded-lg shadow-md text-lg`}
+          disabled={isSpeaking || isAudioPlaying} // Dikdddddsable listening when audio is playing
         >
             {isListening ? 'Stop Listening' : 'Start Listening'}
         </button>
