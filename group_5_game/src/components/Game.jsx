@@ -6,7 +6,6 @@ import SceneManager from './SceneManager.jsx';
 import { speechToTextHandler } from '@/components/handlers/speech_TextHandler';
 import { textToSpeechHandler } from '@/components/handlers/text_SpeechHandler';
 import GameTranscript from '@/components/GameTranscript';
-import Inventory from '@/components/Inventory';
 
 /**
  * Game Component
@@ -19,14 +18,18 @@ import Inventory from '@/components/Inventory';
  */
 
 const Game = () => {
-    // State variables for game status, listening state, transcript, and announcement message.
-    const [gameStarted, setGameStarted] = useState(false);
-    const [isListening, setIsListening] = useState(false); // Tracks if speech recognition is active.
-    const [transcript, setTranscript] = useState([]);
-    const [announcement, setAnnouncement] = useState(''); // Tracks the current announcement.
-    const [inventory, setInventory] = useState(['Knife', 'Stick']); // Example initial inventory
-    // Ref to keep track of the current gameStarted state.
-    const gameStartedRef = useRef(gameStarted);
+  const [speechRate, setSpeechRate] = useState(1); // Default speech rate
+
+  const [gameStarted, setGameStarted] = useState(false);
+  let [currentScene, setCurrentScene] = useState(1);
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false); // Track audio playing state
+  const [transcript, setTranscript] = useState([]);
+  // Ref to keep track of the current gameStarted state.
+  const gameStartedRef = useRef(gameStarted);
+
+  // Update the ref whenever gameStarted state changes.
 
   useEffect(() => {
     gameStartedRef.current = gameStarted;
@@ -49,6 +52,18 @@ const Game = () => {
       { type, text: text.trim(), time: currentTime },
     ]);
   };
+
+
+  const increaseSpeechRate = () => {
+    if (speechRate === 2.0) return; // Prevent going above 2.0
+    setSpeechRate((prevRate) => Math.min(prevRate + 0.5, 2.0)); // Cap at 2.0
+  };
+  
+  const decreaseSpeechRate = () => {
+    if (speechRate === 0.5) return; // Prevent going below 0.5
+    setSpeechRate((prevRate) => Math.max(prevRate - 0.5, 0.5)); // Minimum 0.5
+  };
+  
 
   /**
    * Handles a system-generated message by speaking it aloud and updating the transcript.
@@ -74,7 +89,8 @@ const Game = () => {
 
     try {
         // Speak the system message
-        await textToSpeechHandler.speak(message);
+        // await textToSpeechHandler.speak(message);
+        await textToSpeechHandler.speak(message, { rate: speechRate });
     } finally {
         setIsSpeaking(false);
 
@@ -107,7 +123,14 @@ const Game = () => {
       setGameStarted(true);
       handleSystemMessage('The game has started. ' + getSceneDescription(1));
     } else if (gameStartedRef.current) {
-      if (trimmedText.includes('where')) {
+      if (trimmedText.includes('go faster')) {
+        increaseSpeechRate();
+        handleSystemMessage('Speaking faster.');
+      } else if (trimmedText.includes('go slower')) {
+        decreaseSpeechRate();
+        handleSystemMessage('Speaking slower.');
+
+      }else if (trimmedText.includes('where')) {
         console.log('Current scene:', currentScene);
       
         // Respond with the current scene description
@@ -195,30 +218,17 @@ const Game = () => {
     }
   };
 
-        updateTranscript('User', trimmedText);
-
-        if (trimmedText.toLowerCase().includes('start game')) {
-            if (!gameStartedRef.current) {
-                setGameStarted(true);
-                handleSystemMessage('The game has started!', true); // Mark as announcement.
-            } else {
-                handleSystemMessage('The game has already started.');
-            }
-        }  else if (trimmedText.toLowerCase().includes('use')) {
-        const itemToUse = trimmedText.split('use ')[1]?.trim();
-        if (inventory.includes(itemToUse)) {
-            handleSystemMessage(`You used the ${itemToUse}.`);
-            setInventory(inventory.filter((item) => item !== itemToUse));
-        } else {
-            handleSystemMessage(`You don't have a ${itemToUse} in your inventory.`);
-        }
-    } else if (trimmedText.toLowerCase().includes('what items do i have')) {
-        if (inventory.length > 0) {
-            const itemsList = inventory.join(', ');
-            handleSystemMessage(`You have the following items: ${itemsList}.`);
-        } else {
-            handleSystemMessage('Your inventory is empty.');
-        }
+  
+  const getSceneDescription = (sceneNumber) => {
+    switch (sceneNumber) {
+      case 1:
+        return 'You are at a crossroads. The path to the left leads into a forest. The path to the right leads to a hill with a village. Where do you want to go?';
+      case 2:
+        return 'Oh no, I’m at a wide, rushing river. The current is so strong! I have a rope, a stick, a knife, and a matchstick. What can I use to cross? Help me, please!';
+      case 3:
+        return 'You are in a village with cobblestone streets and warm cottages. Villagers greet you kindly. What will you do next?';
+      default:
+        return 'Unknown scene.';
     }
 
 };
