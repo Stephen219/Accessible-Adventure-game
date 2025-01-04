@@ -26,6 +26,7 @@ const Game = () => {
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [isAudioPlaying, setIsAudioPlaying] = useState(false); // Track audio playing state
     const [transcript, setTranscript] = useState([]);
+    const [announcement, setAnnouncement] = useState('');
     // Ref to keep track of the current gameStarted state.
     const gameStartedRef = useRef(gameStarted);
 
