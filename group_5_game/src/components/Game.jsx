@@ -274,7 +274,7 @@ const Game = () => {
           } hover:bg-${
             isListening ? 'red-700' : 'purple-700'
           } transition-colors text-white font-semibold px-6 py-3 rounded-lg shadow-md text-lg`}
-          disabled={isSpeaking || isAudioPlaying} // Disable listening when audio is playing
+          disabled={isSpeaking || isAudioPlaying} // Dikdddddsable listening when audio is playing
         >
           {isListening ? 'Stop Listening' : 'Start Listening'}
         </button>
