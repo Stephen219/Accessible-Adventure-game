@@ -6,6 +6,7 @@ import SceneManager from './SceneManager.jsx';
 import { speechToTextHandler } from '@/components/handlers/speech_TextHandler';
 import { textToSpeechHandler } from '@/components/handlers/text_SpeechHandler';
 import GameTranscript from '@/components/GameTranscript';
+import Inventory from '@/components/Inventory';
 
 /**
  * Game Component
