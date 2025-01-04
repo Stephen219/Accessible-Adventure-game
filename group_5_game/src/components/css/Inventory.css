@@ -1,0 +1,68 @@
+/* General Inventory Container */
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #121212; /* Dark background */
+    color: #e0e0e0; /* Light text */
+}
+
+.inventory-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+}
+
+.inventory-title {
+    font-size: 2.5rem;
+    color: #03dac6;
+}
+
+.inventory-section {
+    margin: 20px 0;
+}
+
+.inventory-section h2 {
+    font-size: 1.5rem;
+    color: #bb86fc; /* Subsection titles */
+}
+
+.inventory-item {
+    list-style-type: none;
+    font-size: 1.2rem;
+    margin: 5px 0;
+}
+
+.inventory-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #121212;
+    background-color: #bb86fc;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 5px;
+}
+
+.inventory-button:hover {
+    background-color: #3700b3;
+}
+
+.tell-inventory-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #121212;
+    background-color: #03dac6;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 20px 0;
+}
+
+.tell-inventory-button:hover {
+    background-color: #018786;
+}

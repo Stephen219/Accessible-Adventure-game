@@ -1,8 +1,8 @@
 
 'use client';
-import React from 'react';
+// import React from 'react';
 import React, { useState, useEffect } from 'react';
-import { textToSpeechHandler } from '../handlers/text_SpeechHandler';
+// import { textToSpeechHandler } from '../handlers/text_SpeechHandler';
 
 /**
  * TextToSpeechHandler Class
@@ -116,6 +116,7 @@ class TextToSpeechHandler {
         if (this.synthesis) this.synthesis.cancel();
     }
 
+  }
 
     export
     const
