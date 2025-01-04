@@ -258,7 +258,8 @@ return (
             <p className="announcement">{announcement}</p>
         ) : (
             <p className="instruction">
-                Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>, or <strong>&quot;restart game&quot;</strong>.
+                Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>,
+                or <strong>&quot;restart game&quot;</strong>.
             </p>
         )}
 
@@ -273,35 +274,35 @@ return (
 
         {/* Component to display the game's transcript */}
         <GameTranscript transcript={transcript} />
+
+        {/* Game Content Section */}
+        <div className="w-full max-w-4xl bg-gray-800 bg-opacity-90 rounded-lg p-6 shadow-lg text-center">
+            <h1 className="text-4xl font-bold mb-6 text-purple-400">Adventure Game</h1>
+
+            {/* Game Instructions or Scene Manager */}
+            {!gameStarted ? (
+                <p className="text-gray-300 text-lg italic">
+                    Say <span className="text-purple-400 font-bold">Start Game</span> to begin.
+                </p>
+            ) : (
+                <div className="mt-4">
+                    <SceneManager currentScene={currentScene} />
+                </div>
+            )}
+
+            {/* Button to Start or Stop Listening */}
+            <button
+                onClick={startListening}
+                className={`mt-6 ${
+                    isListening ? 'bg-red-600 hover:bg-red-700' : 'bg-purple-600 hover:bg-purple-700'
+                } transition-colors text-white font-semibold px-6 py-3 rounded-lg shadow-md text-lg`}
+                disabled={isSpeaking || isAudioPlaying} // Disable listening when audio is playing
+            >
+                {isListening ? 'Stop Listening' : 'Start Listening'}
+            </button>
+        </div>
     </div>
 );
-
-
-{/* Game Content Section */}
-<div className="w-full max-w-4xl bg-gray-800 bg-opacity-90 rounded-lg p-6 shadow-lg text-center">
-    <h1 className="text-4xl font-bold mb-6 text-purple-400">Adventure Game</h1>
-
-    {/* Game Instructions or Scene Manager */}
-    {!gameStarted ? (
-        <p className="text-gray-300 text-lg italic">
-            Say <span className="text-purple-400 font-bold">Start Game</span> to begin.
-        </p>
-    ) : (
-        <div className="mt-4">
-            <SceneManager currentScene={currentScene} />
-        </div>
-    )}
-
-    {/* Button to Start or Stop Listening */}
-    <button
-        onClick={startListening}
-        className={`mt-6 ${
-            isListening ? 'bg-red-600 hover:bg-red-700' : 'bg-purple-600 hover:bg-purple-700'
-        } transition-colors text-white font-semibold px-6 py-3 rounded-lg shadow-md text-lg`}
-        disabled={isSpeaking || isAudioPlaying} // Disable listening when audio is playing
-    >
-        {isListening ? 'Stop Listening' : 'Start Listening'}
-    </button>
-</div>
+};
 
 export default Game;
