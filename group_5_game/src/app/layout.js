@@ -1,6 +1,7 @@
 
 import "./globals.css";
 import React from "react";
+import { AuthProvider } from '@/utils/AuthContext';
 
 
 
@@ -23,7 +24,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="antialiased">
-        {children}
+
+      <AuthProvider>{children}</AuthProvider>
+
+        {/* {children} */}
       </body>
     </html>
   );
