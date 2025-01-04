@@ -8,6 +8,7 @@ import { textToSpeechHandler } from '@/components/handlers/text_SpeechHandler';
 import GameTranscript from '@/components/GameTranscript';
 import Inventory from '@/components/Inventory';
 
+
 /**
  * Game Component
  *
@@ -265,7 +266,7 @@ const Game = () => {
             <hr className="divider"/>
 
             {/* Inventory Component */}
-            <InventoryList/>
+            <Inventory/>
 
             {/* Component to display the game's transcript */}
             <GameTranscript transcript={transcript}/>
