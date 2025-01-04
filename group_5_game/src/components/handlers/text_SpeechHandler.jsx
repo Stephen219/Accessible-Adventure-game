@@ -118,7 +118,9 @@ class TextToSpeechHandler {
 
   }
 
-  export const textToSpeechHandler = new TextToSpeechHandler();
+  export
+    const
+    textToSpeechHandler = new TextToSpeechHandler();
 
 
 // const GameController = () => {

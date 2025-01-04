@@ -6,6 +6,7 @@ import SceneManager from './SceneManager.jsx';
 import { speechToTextHandler } from '@/components/handlers/speech_TextHandler';
 import { textToSpeechHandler } from '@/components/handlers/text_SpeechHandler';
 import GameTranscript from '@/components/GameTranscript';
+import Inventory from '@/components/Inventory';
 
 /**
  * Game Component
@@ -18,16 +19,14 @@ import GameTranscript from '@/components/GameTranscript';
  */
 
 const Game = () => {
-  const [gameStarted, setGameStarted] = useState(false);
-  let [currentScene, setCurrentScene] = useState(1);
-  const [isListening, setIsListening] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false); // Track audio playing state
-  const [transcript, setTranscript] = useState([]);
-  // Ref to keep track of the current gameStarted state.
-  const gameStartedRef = useRef(gameStarted);
-
-  // Update the ref whenever gameStarted state changes.
+    // State variables for game status, listening state, transcript, and announcement message.
+    const [gameStarted, setGameStarted] = useState(false);
+    const [isListening, setIsListening] = useState(false); // Tracks if speech recognition is active.
+    const [transcript, setTranscript] = useState([]);
+    const [announcement, setAnnouncement] = useState(''); // Tracks the current announcement.
+    const [inventory, setInventory] = useState(['Knife', 'Stick']); // Example initial inventory
+    // Ref to keep track of the current gameStarted state.
+    const gameStartedRef = useRef(gameStarted);
 
   useEffect(() => {
     gameStartedRef.current = gameStarted;
@@ -196,27 +195,79 @@ const Game = () => {
     }
   };
 
-  
-  const getSceneDescription = (sceneNumber) => {
-    switch (sceneNumber) {
-      case 1:
-        return 'You are at a crossroads. The path to the left leads into a forest. The path to the right leads to a hill with a village. Where do you want to go?';
-      case 2:
-        return 'Oh no, I’m at a wide, rushing river. The current is so strong! I have a rope, a stick, a knife, and a matchstick. What can I use to cross? Help me, please!';
-      case 3:
-        return 'You are in a village with cobblestone streets and warm cottages. Villagers greet you kindly. What will you do next?';
-      default:
-        return 'Unknown scene.';
+        updateTranscript('User', trimmedText);
+
+        if (trimmedText.toLowerCase().includes('start game')) {
+            if (!gameStartedRef.current) {
+                setGameStarted(true);
+                handleSystemMessage('The game has started!', true); // Mark as announcement.
+            } else {
+                handleSystemMessage('The game has already started.');
+            }
+        }  else if (trimmedText.toLowerCase().includes('use')) {
+        const itemToUse = trimmedText.split('use ')[1]?.trim();
+        if (inventory.includes(itemToUse)) {
+            handleSystemMessage(`You used the ${itemToUse}.`);
+            setInventory(inventory.filter((item) => item !== itemToUse));
+        } else {
+            handleSystemMessage(`You don't have a ${itemToUse} in your inventory.`);
+        }
+    } else if (trimmedText.toLowerCase().includes('what items do i have')) {
+        if (inventory.length > 0) {
+            const itemsList = inventory.join(', ');
+            handleSystemMessage(`You have the following items: ${itemsList}.`);
+        } else {
+            handleSystemMessage('Your inventory is empty.');
+        }
     }
-  };
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex flex-col items-center p-6">
-      {/* Transcript Section */}
-      <div className="bg-gray-700 bg-opacity-80 rounded-lg p-6 w-full max-w-4xl shadow-lg mb-8">
-        <h2 className="text-2xl font-semibold mb-4">Transcript</h2>
-        <div className="bg-gray-900 rounded-lg p-4 h-40 overflow-y-auto shadow-inner">
-          <GameTranscript transcript={transcript} />
-        </div>
+
+};
+
+    /**
+     * Toggles speech recognition on or off based on the current listening state.
+     *
+     * If speech recognition is not active, it starts listening and sets up the necessary callbacks.
+     * If it is already active, it stops listening to conserve resources and prevent unintended input.
+     */
+    const startListening = () => {
+        if (!isListening) {
+            speechToTextHandler.handleStartListening({
+                onResult: handleUserSpeech,
+                setIsListening,
+            });
+        } else {
+            speechToTextHandler.handleStopListening({ setIsListening });
+        }
+    };
+
+
+return (
+    <div className="game-container">
+        <h1 className="game-title">Adventure Game</h1>
+
+        {/* Display instructions or announcement */}
+        {announcement ? (
+            <p className="announcement">{announcement}</p>
+        ) : (
+            <p className="instruction">
+                Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>, or <strong>&quot;restart game&quot;</strong>.
+            </p>
+        )}
+
+        {/* Button to start or stop listening for speech input */}
+        <button onClick={startListening} className="listen-button">
+            {isListening ? 'Stop Listening' : 'Start Listening'}
+        </button>
+        <hr className="divider" />
+
+        {/* Inventory Component */}
+        <Inventory />
+
+        {/* Component to display the game's transcript */}
+        <GameTranscript transcript={transcript} />
+    </div>
+)
+
       </div>
 
       {/* Game Content Section */}
