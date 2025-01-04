@@ -28,172 +28,171 @@ const Game = () => {
     // Ref to keep track of the current gameStarted state.
     const gameStartedRef = useRef(gameStarted);
 
-  useEffect(() => {
-    gameStartedRef.current = gameStarted;
-  }, [gameStarted]);
+    useEffect(() => {
+        gameStartedRef.current = gameStarted;
+    }, [gameStarted]);
 
-  /**
-   * Updates the transcript by adding a new entry.
-   *
-   * This function formats the provided text, capitalizes the first word if the type is "User", ensures it ends with a period,
-   * adds the current time in hh:mm:ss format, and then adds it to the transcript state to be displayed in the game transcript.
-   *
-   * @param {string} type - The speaker type ("User" or "System").
-   * @param {string} text - The text to add to the transcript.
-   */
+    /**
+     * Updates the transcript by adding a new entry.
+     *
+     * This function formats the provided text, capitalizes the first word if the type is "User", ensures it ends with a period,
+     * adds the current time in hh:mm:ss format, and then adds it to the transcript state to be displayed in the game transcript.
+     *
+     * @param {string} type - The speaker type ("User" or "System").
+     * @param {string} text - The text to add to the transcript.
+     */
 
-  const updateTranscript = (type, text) => {
-    const currentTime = new Date().toLocaleTimeString([], { hour12: false });
-    setTranscript((prev) => [
-      ...prev,
-      { type, text: text.trim(), time: currentTime },
-    ]);
-  };
+    const updateTranscript = (type, text) => {
+        const currentTime = new Date().toLocaleTimeString([], {hour12: false});
+        setTranscript((prev) => [
+            ...prev,
+            {type, text: text.trim(), time: currentTime},
+        ]);
+    };
 
-  /**
-   * Handles a system-generated message by speaking it aloud and updating the transcript.
-   *
-   * This function stops speech recognition to avoid conflicts, adds the system message to the transcript,
-   * updates the announcement message if it's an announcement, uses text-to-speech to speak the message,
-   * and then resumes speech recognition after speaking.
-   *
-   * @param {string} message - The system message to process.
-   * @param {boolean} [isAnnouncement=false] - Indicates if the message is an important announcement.
-   */
+    /**
+     * Handles a system-generated message by speaking it aloud and updating the transcript.
+     *
+     * This function stops speech recognition to avoid conflicts, adds the system message to the transcript,
+     * updates the announcement message if it's an announcement, uses text-to-speech to speak the message,
+     * and then resumes speech recognition after speaking.
+     *
+     * @param {string} message - The system message to process.
+     * @param {boolean} [isAnnouncement=false] - Indicates if the message is an important announcement.
+     */
 
 
 
-  const handleSystemMessage = async (message) => {
-    // Ensure mic is off during system response
-    await speechToTextHandler.handleStopListening({ setIsListening });
+    const handleSystemMessage = async (message) => {
+        // Ensure mic is off during system response
+        await speechToTextHandler.handleStopListening({setIsListening});
 
-    updateTranscript('System', message);
-    console.log('SysthFFFFFuVFVhuhem:   delete me', message); // FIX ME: Delete this line
+        updateTranscript('System', message);
+        console.log('SysthFFFFFuVFVhuhem:   delete me', message); // FIX ME: Delete this line
 
-    setIsSpeaking(true);
+        setIsSpeaking(true);
 
-    try {
-        // Speak the system message
-        await textToSpeechHandler.speak(message);
-    } finally {
-        setIsSpeaking(false);
+        try {
+            // Speak the system message
+            await textToSpeechHandler.speak(message);
+        } finally {
+            setIsSpeaking(false);
 
-        // Resume speech recognition only if no audio is playing
-        if (!isAudioPlaying) {
+            // Resume speech recognition only if no audio is playing
+            if (!isAudioPlaying) {
+                speechToTextHandler.handleStartListening({
+                    onResult: handleUserSpeech,
+                    setIsListening,
+                });
+            }
+        }
+    };
+
+
+    /**
+     * Processes the recognized speech input from the user.
+     *
+     * This function trims the input text, updates the transcript with the user's input,
+     * and checks if the user has issued a command to start the game.
+     *
+     * @param {string} text - The recognized speech text.
+     */
+
+    const handleUserSpeech = (text) => {
+        const trimmedText = text.trim().toLowerCase();
+
+        updateTranscript('User', text);
+
+        if (!gameStartedRef.current && trimmedText.includes('start game')) {
+            setGameStarted(true);
+            handleSystemMessage('The game has started. ' + getSceneDescription(1));
+        } else if (gameStartedRef.current) {
+            if (trimmedText.includes('where')) {
+                console.log('Current scene:', currentScene);
+
+                // Respond with the current scene description
+                handleSystemMessage(getSceneDescription(currentScene));
+            } else if (trimmedText.includes('go to') && currentScene === 1) {
+
+                setCurrentScene(2);  // Transition to scene 2
+                currentScene = 2;
+                console.log('Transitioning to scene 2');
+                playAudioAndTransition(2);
+            } else if (trimmedText.includes('yes') && currentScene === 2) {
+                console.log('Transitioning to scene 3');
+                // if (isAudioPlaying) return; // Prevent duplicate audio playback
+                // setCurrentScene(3);
+                // handleSystemMessage(getSceneDescription(3));
+                setCurrentScene(3);  // Transition to scene 2
+                currentScene = 3;
+                console.log('Transitioning to scene 2');
+                playAudioAndTransition(3);
+            } else if (trimmedText.toLowerCase().includes('number') && currentScene === 3) {
+                if (isAudioPlaying) return; // Prevent duplicate audio playback
+                setCurrentScene(1);  // Transition to scene 2
+                currentScene = 1;
+                console.log('Transitioning to scene 1');
+                console.log('Current scene:', currentScene);
+
+            } else {
+                handleSystemMessage('Command not recognized. Please repeat.');
+            }
+        }
+    };
+
+
+    const playAudioAndTransition = (sceneNumber) => {
+        const audioMap = {
+            2: '/walking.mp3',
+            3: '/transition3.mp3', // Example for scene 3 audio
+        };
+
+        const audioSrc = audioMap[sceneNumber];
+        if (audioSrc && !isAudioPlaying) {
+            // Ensure mic is off during audio playback
+            speechToTextHandler.handleStopListening({setIsListening});
+
+            const audio = new Audio(audioSrc);
+
+            setIsAudioPlaying(true); // Set audio playing state to true
+
+            audio.play().catch((err) => console.error('Audio playback error:', err));
+
+            audio.onended = async () => {
+                setIsAudioPlaying(false); // Reset audio playing state
+                // When audio finishes, handle the next steps
+                if (sceneNumber === 2) {
+                    await handleSystemMessage(getSceneDescription(2)); // Announce Scene 2 after audio
+                } else if (sceneNumber === 3) {
+                    await handleSystemMessage(getSceneDescription(3)); // Announce Scene 3 after audio
+                }
+                // Start listening again after audio finishes
+                speechToTextHandler.handleStartListening({
+                    onResult: handleUserSpeech,
+                    setIsListening,
+                });
+            };
+        }
+    };
+
+    /**
+     * Toggles speech recognition on or off based on the current listening state.
+     *
+     * If speech recognition is not active, it starts listening and sets up the necessary callbacks.
+     * If it is already active, it stops listening to conserve resources and prevent unintended input.
+     */
+
+    const startListening = () => {
+        if (!isListening && !isSpeaking && !isAudioPlaying) {
+            // Ensure mic isn't on during audio playback
             speechToTextHandler.handleStartListening({
                 onResult: handleUserSpeech,
                 setIsListening,
             });
+        } else {
+            speechToTextHandler.handleStopListening({setIsListening});
         }
-    }
-};
-
-
-  /**
-   * Processes the recognized speech input from the user.
-   *
-   * This function trims the input text, updates the transcript with the user's input,
-   * and checks if the user has issued a command to start the game.
-   *
-   * @param {string} text - The recognized speech text.
-   */
-
-  const handleUserSpeech = (text) => {
-    const trimmedText = text.trim().toLowerCase();
-
-    updateTranscript('User', text);
-
-    if (!gameStartedRef.current && trimmedText.includes('start game')) {
-      setGameStarted(true);
-      handleSystemMessage('The game has started. ' + getSceneDescription(1));
-    } else if (gameStartedRef.current) {
-      if (trimmedText.includes('where')) {
-        console.log('Current scene:', currentScene);
-      
-        // Respond with the current scene description
-        handleSystemMessage(getSceneDescription(currentScene));
-      } else if (trimmedText.includes('go to') && currentScene === 1) {
-      
-        setCurrentScene(2);  // Transition to scene 2
-        currentScene = 2;
-        console.log('Transitioning to scene 2');
-        playAudioAndTransition(2);
-      } else if (trimmedText.includes('yes') && currentScene === 2) {
-        console.log('Transitioning to scene 3');
-        // if (isAudioPlaying) return; // Prevent duplicate audio playback
-        // setCurrentScene(3);
-        // handleSystemMessage(getSceneDescription(3));
-        setCurrentScene(3);  // Transition to scene 2
-        currentScene = 3;
-        console.log('Transitioning to scene 2');
-        playAudioAndTransition(3);
-      } else if (trimmedText.toLowerCase().includes('number') && currentScene === 3) {
-        if (isAudioPlaying) return; // Prevent duplicate audio playback
-        setCurrentScene(1);  // Transition to scene 2
-        currentScene = 1;
-        console.log('Transitioning to scene 1');
-        console.log('Current scene:', currentScene);
-
-      } else {
-        handleSystemMessage('Command not recognized. Please repeat.');
-      }
-    }
-  };
-
-
-
-  const playAudioAndTransition = (sceneNumber) => {
-    const audioMap = {
-      2: '/walking.mp3',
-      3: '/transition3.mp3', // Example for scene 3 audio
     };
-  
-    const audioSrc = audioMap[sceneNumber];
-    if (audioSrc && !isAudioPlaying) {
-      // Ensure mic is off during audio playback
-      speechToTextHandler.handleStopListening({ setIsListening });
-  
-      const audio = new Audio(audioSrc);
-  
-      setIsAudioPlaying(true); // Set audio playing state to true
-  
-      audio.play().catch((err) => console.error('Audio playback error:', err));
-  
-      audio.onended = async () => {
-        setIsAudioPlaying(false); // Reset audio playing state
-        // When audio finishes, handle the next steps
-        if (sceneNumber === 2) {
-          await handleSystemMessage(getSceneDescription(2)); // Announce Scene 2 after audio
-        } else if (sceneNumber === 3) {
-          await handleSystemMessage(getSceneDescription(3)); // Announce Scene 3 after audio
-        }
-        // Start listening again after audio finishes
-        speechToTextHandler.handleStartListening({
-          onResult: handleUserSpeech,
-          setIsListening,
-        });
-      };
-    }
-  };
-  
-  /**
-   * Toggles speech recognition on or off based on the current listening state.
-   *
-   * If speech recognition is not active, it starts listening and sets up the necessary callbacks.
-   * If it is already active, it stops listening to conserve resources and prevent unintended input.
-   */
-
-  const startListening = () => {
-    if (!isListening && !isSpeaking && !isAudioPlaying) {
-      // Ensure mic isn't on during audio playback
-      speechToTextHandler.handleStartListening({
-        onResult: handleUserSpeech,
-        setIsListening,
-      });
-    } else {
-      speechToTextHandler.handleStopListening({ setIsListening });
-    }
-  };
 
     updateTranscript('User', trimmedText);
 
@@ -204,8 +203,7 @@ const Game = () => {
         } else {
             handleSystemMessage('The game has already started.');
         }
-    }
-    else if (trimmedText.toLowerCase().includes('use')) {
+    } else if (trimmedText.toLowerCase().includes('use')) {
         const itemToUse = trimmedText.split('use ')[1]?.trim();
         if (inventory.includes(itemToUse)) {
             handleSystemMessage(`You used the ${itemToUse}.`);
@@ -247,29 +245,37 @@ const Game = () => {
                 setIsListening,
             });
         } else {
-            speechToTextHandler.handleStopListening({ setIsListening });
+            speechToTextHandler.handleStopListening({setIsListening});
         }
     };
 
 
-    {/* Display instructions or announcement */}
-            {announcement ? (
-                <p className="announcement">{announcement}</p>
-            ) : (
-                <p className="instruction">
-                    Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>, or <strong>&quot;restart game&quot;</strong>.
-
-                </p>
-            )}
-
-        {/* Display instructions or announcement */}
-        {announcement ? (
+    {/* Display instructions or announcement */
+    }
+    {
+        announcement ? (
             <p className="announcement">{announcement}</p>
         ) : (
             <p className="instruction">
-                Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>, or <strong>&quot;restart game&quot;</strong>.
+                Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>,
+                or <strong>&quot;restart game&quot;</strong>.
+
             </p>
-        )}
+        )
+    }
+
+    {/* Display instructions or announcement */
+    }
+    {
+        announcement ? (
+            <p className="announcement">{announcement}</p>
+        ) : (
+            <p className="instruction">
+                Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>,
+                or <strong>&quot;restart game&quot;</strong>.
+            </p>
+        )
+    }
 
     return (
         <div className="game-container">
@@ -280,7 +286,8 @@ const Game = () => {
                 <p className="announcement">{announcement}</p>
             ) : (
                 <p className="instruction">
-                    Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>, or <strong>&quot;restart game&quot;</strong>.
+                    Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>,
+                    or <strong>&quot;restart game&quot;</strong>.
                 </p>
             )}
 
@@ -288,17 +295,18 @@ const Game = () => {
             <button onClick={startListening} className="listen-button">
                 {isListening ? 'Stop Listening' : 'Start Listening'}
             </button>
-            <hr className="divider" />
+            <hr className="divider"/>
 
             {/* Inventory Component */}
-            <Inventory />
+            <Inventory/>
 
             {/* Component to display the game's transcript */}
-            <GameTranscript transcript={transcript} />
+            <GameTranscript transcript={transcript}/>
         </div>
     );
 
-    {/* Game Content Section */}
+    {/* Game Content Section */
+    }
     <div className="w-full max-w-4xl bg-gray-800 bg-opacity-90 rounded-lg p-6 shadow-lg text-center">
         <h1 className="text-4xl font-bold mb-6 text-purple-400">Adventure Game</h1>
 
@@ -309,7 +317,7 @@ const Game = () => {
             </p>
         ) : (
             <div className="mt-4">
-                <SceneManager currentScene={currentScene} />
+                <SceneManager currentScene={currentScene}/>
             </div>
         )}
 
@@ -325,5 +333,5 @@ const Game = () => {
         </button>
     </div>
 
-
+}
 export default Game;
