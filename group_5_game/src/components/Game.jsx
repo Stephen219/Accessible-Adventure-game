@@ -186,50 +186,53 @@ const Game = () => {
         if (!isListening && !isSpeaking && !isAudioPlaying) {
             // Ensure mic isn't on during audio playback
             speechToTextHandler.handleStartListening({
-                onResult: handleUserSpeech,
+                onResult: (text) => {
+                    const trimmedText = text.trim().toLowerCase(); // Ensure trimmedText is scoped correctly here
+
+                    updateTranscript('User', text);
+
+                    if (trimmedText.includes('start game')) {
+                        if (!gameStartedRef.current) {
+                            setGameStarted(true);
+                            handleSystemMessage('The game has started!', true); // Mark as announcement.
+                        } else {
+                            handleSystemMessage('The game has already started.');
+                        }
+                    } else if (trimmedText.includes('use')) {
+                        const itemToUse = trimmedText.split('use ')[1]?.trim();
+                        if (inventory.includes(itemToUse)) {
+                            handleSystemMessage(`You used the ${itemToUse}.`);
+                            setInventory(inventory.filter((item) => item !== itemToUse));
+                        } else {
+                            handleSystemMessage(`You don't have a ${itemToUse} in your inventory.`);
+                        }
+                    }
+                    // Stop the game
+                    else if (trimmedText.includes('stop game')) {
+                        if (gameStartedRef.current) {
+                            setGameStarted(false);
+                            handleSystemMessage('The game has been stopped.', true);
+                        } else {
+                            handleSystemMessage('The game is not currently running.');
+                        }
+                    }
+                    // Restart the game
+                    else if (trimmedText.includes('restart game')) {
+                        if (gameStartedRef.current) {
+                            handleSystemMessage('Restarting the game.', true);
+                        } else {
+                            handleSystemMessage('Starting the game.', true);
+                        }
+                        setGameStarted(true);
+                    }
+                },
                 setIsListening,
             });
         } else {
-            speechToTextHandler.handleStopListening({setIsListening});
+            speechToTextHandler.handleStopListening({ setIsListening });
         }
     };
 
-    updateTranscript('User', trimmedText);
-
-    if (trimmedText.toLowerCase().includes('start game')) {
-        if (!gameStartedRef.current) {
-            setGameStarted(true);
-            handleSystemMessage('The game has started!', true); // Mark as announcement.
-        } else {
-            handleSystemMessage('The game has already started.');
-        }
-    } else if (trimmedText.toLowerCase().includes('use')) {
-        const itemToUse = trimmedText.split('use ')[1]?.trim();
-        if (inventory.includes(itemToUse)) {
-            handleSystemMessage(`You used the ${itemToUse}.`);
-            setInventory(inventory.filter((item) => item !== itemToUse));
-        } else {
-            handleSystemMessage(`You don't have a ${itemToUse} in your inventory.`);
-        }
-    }
-// Stop the game
-    else if (trimmedText.toLowerCase().includes('stop game')) {
-        if (gameStartedRef.current) {
-            setGameStarted(false);
-            handleSystemMessage('The game has been stopped.', true);
-        } else {
-            handleSystemMessage('The game is not currently running.');
-        }
-    }
-// Restart the game
-    else if (trimmedText.toLowerCase().includes('restart game')) {
-        if (gameStartedRef.current) {
-            handleSystemMessage('Restarting the game.', true);
-        } else {
-            handleSystemMessage('Starting the game.', true);
-        }
-        setGameStarted(true);
-    }
 
 
     /**
