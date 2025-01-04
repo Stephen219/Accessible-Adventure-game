@@ -214,7 +214,7 @@ const Game = () => {
         }
         // Stop the game
         else if (trimmedText.toLowerCase().includes('stop game'))
-        {
+
             if (gameStartedRef.current) {
                 setGameStarted(false);
                 handleSystemMessage('The game has been stopped.', true);
