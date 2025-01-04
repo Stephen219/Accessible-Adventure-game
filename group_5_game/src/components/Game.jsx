@@ -266,9 +266,8 @@ return (
         {/* Component to display the game's transcript */}
         <GameTranscript transcript={transcript} />
     </div>
-)
+);
 
-      </div>
 
       {/* Game Content Section */}
       <div className="w-full max-w-4xl bg-gray-800 bg-opacity-90 rounded-lg p-6 shadow-lg text-center">
