@@ -134,7 +134,26 @@ const Game = () => {
         console.log('Transitioning to scene 1');
         console.log('Current scene:', currentScene);
 
-      } else {
+      }else if (trimmedText.toLowerCase().includes('use')) {
+          const itemToUse = trimmedText.split('use ')[1]?.trim();
+          if (itemToUse) {
+              // Call useItem function from Inventory
+              const inventoryComponent = document.querySelector('.inventory-container'); // Ensure Inventory has a known class
+              if (inventoryComponent && inventoryComponent.useItem) {
+                  inventoryComponent.useItem(itemToUse);
+              } else {
+                  handleSystemMessage(`You don't have the ability to use items.`);
+              }
+          }
+      } else if (trimmedText.toLowerCase().includes('what items do i have')) {
+          if (inventory.length > 0) {
+              const itemsList = inventory.join(', ');
+              handleSystemMessage(`You have the following items: ${itemsList}.`);
+          } else {
+              handleSystemMessage('Your inventory is empty.');
+          }
+      }
+    } else {
         handleSystemMessage('Command not recognized. Please repeat.');
       }
     }
