@@ -1,5 +1,3 @@
-
-
 import React, { useState, useRef, useEffect } from 'react';
 import '@/components/css/Game.css';
 import SceneManager from './SceneManager.jsx';
@@ -8,301 +6,168 @@ import { textToSpeechHandler } from '@/components/handlers/text_SpeechHandler';
 import GameTranscript from '@/components/GameTranscript';
 import Inventory from '@/components/Inventory';
 
-/**
- * Game Component
- *
- * This component represents the main game interface, handling speech recognition, text-to-speech, and game state management.
- * Users can start or stop listening, and the game will process voice commands to control the gameplay.
- *
- * @component
- * @returns {JSX.Element} - The rendered game component.
- */
-
 const Game = () => {
-    // State variables for game status, listening state, transcript, and announcement message.
+    // State variables
     const [gameStarted, setGameStarted] = useState(false);
-    const [isListening, setIsListening] = useState(false); // Tracks if speech recognition is active.
+    const [isListening, setIsListening] = useState(false);
     const [transcript, setTranscript] = useState([]);
-    const [announcement, setAnnouncement] = useState(''); // Tracks the current announcement.
-    const [inventory, setInventory] = useState(['Knife', 'Stick']); // Example initial inventory
-    // Ref to keep track of the current gameStarted state.
+    const [announcement, setAnnouncement] = useState('');
+    const [inventory, setInventory] = useState(['Knife', 'Stick']);
     const gameStartedRef = useRef(gameStarted);
 
-  useEffect(() => {
-    gameStartedRef.current = gameStarted;
-  }, [gameStarted]);
+    // Update ref whenever gameStarted state changes
+    useEffect(() => {
+        gameStartedRef.current = gameStarted;
+    }, [gameStarted]);
 
-  /**
-   * Updates the transcript by adding a new entry.
-   *
-   * This function formats the provided text, capitalizes the first word if the type is "User", ensures it ends with a period,
-   * adds the current time in hh:mm:ss format, and then adds it to the transcript state to be displayed in the game transcript.
-   *
-   * @param {string} type - The speaker type ("User" or "System").
-   * @param {string} text - The text to add to the transcript.
-   */
+    const updateTranscript = (type, text) => {
+        const currentTime = new Date().toLocaleTimeString([], { hour12: false });
+        setTranscript((prev) => [
+            ...prev,
+            { type, text: text.trim(), time: currentTime },
+        ]);
+    };
 
-  const updateTranscript = (type, text) => {
-    const currentTime = new Date().toLocaleTimeString([], { hour12: false });
-    setTranscript((prev) => [
-      ...prev,
-      { type, text: text.trim(), time: currentTime },
-    ]);
-  };
+    const handleSystemMessage = async (message) => {
+        await speechToTextHandler.handleStopListening({ setIsListening });
+        updateTranscript('System', message);
+        setIsSpeaking(true);
 
-  /**
-   * Handles a system-generated message by speaking it aloud and updating the transcript.
-   *
-   * This function stops speech recognition to avoid conflicts, adds the system message to the transcript,
-   * updates the announcement message if it's an announcement, uses text-to-speech to speak the message,
-   * and then resumes speech recognition after speaking.
-   *
-   * @param {string} message - The system message to process.
-   * @param {boolean} [isAnnouncement=false] - Indicates if the message is an important announcement.
-   */
+        try {
+            await textToSpeechHandler.speak(message);
+        } finally {
+            setIsSpeaking(false);
+            if (!isAudioPlaying) {
+                speechToTextHandler.handleStartListening({
+                    onResult: handleUserSpeech,
+                    setIsListening,
+                });
+            }
+        }
+    };
 
+    const handleUserSpeech = (text) => {
+        const trimmedText = text.trim().toLowerCase();
+        updateTranscript('User', text);
 
+        if (!gameStartedRef.current && trimmedText.includes('start game')) {
+            setGameStarted(true);
+            handleSystemMessage('The game has started. ' + getSceneDescription(1));
+        } else if (gameStartedRef.current) {
+            if (trimmedText.includes('where')) {
+                handleSystemMessage(getSceneDescription(currentScene));
+            } else if (trimmedText.includes('go to') && currentScene === 1) {
+                setCurrentScene(2);
+                playAudioAndTransition(2);
+            } else if (trimmedText.includes('yes') && currentScene === 2) {
+                setCurrentScene(3);
+                playAudioAndTransition(3);
+            } else if (trimmedText.includes('number') && currentScene === 3) {
+                setCurrentScene(1);
+            } else if (trimmedText.includes('use')) {
+                const itemToUse = trimmedText.split('use ')[1]?.trim();
+                if (inventory.includes(itemToUse)) {
+                    handleSystemMessage(`You used the ${itemToUse}.`);
+                    setInventory(inventory.filter((item) => item !== itemToUse));
+                } else {
+                    handleSystemMessage(`You don't have a ${itemToUse} in your inventory.`);
+                }
+            } else if (trimmedText.includes('what items do i have')) {
+                if (inventory.length > 0) {
+                    handleSystemMessage(`You have the following items: ${inventory.join(', ')}.`);
+                } else {
+                    handleSystemMessage('Your inventory is empty.');
+                }
+            } else {
+                handleSystemMessage('Command not recognized. Please repeat.');
+            }
+        }
+    };
 
-  const handleSystemMessage = async (message) => {
-    // Ensure mic is off during system response
-    await speechToTextHandler.handleStopListening({ setIsListening });
+    const playAudioAndTransition = (sceneNumber) => {
+        const audioMap = {
+            2: '/walking.mp3',
+            3: '/transition3.mp3',
+        };
 
-    updateTranscript('System', message);
-    console.log('SysthFFFFFuVFVhuhem:   delete me', message); // FIX ME: Delete this line
+        const audioSrc = audioMap[sceneNumber];
+        if (audioSrc && !isAudioPlaying) {
+            speechToTextHandler.handleStopListening({ setIsListening });
+            const audio = new Audio(audioSrc);
 
-    setIsSpeaking(true);
+            setIsAudioPlaying(true);
 
-    try {
-        // Speak the system message
-        await textToSpeechHandler.speak(message);
-    } finally {
-        setIsSpeaking(false);
+            audio.play().catch((err) => console.error('Audio playback error:', err));
 
-        // Resume speech recognition only if no audio is playing
-        if (!isAudioPlaying) {
+            audio.onended = async () => {
+                setIsAudioPlaying(false);
+                await handleSystemMessage(getSceneDescription(sceneNumber));
+                speechToTextHandler.handleStartListening({
+                    onResult: handleUserSpeech,
+                    setIsListening,
+                });
+            };
+        }
+    };
+
+    const startListening = () => {
+        if (!isListening && !isSpeaking && !isAudioPlaying) {
             speechToTextHandler.handleStartListening({
                 onResult: handleUserSpeech,
                 setIsListening,
             });
-        }
-    }
-};
-
-
-  /**
-   * Processes the recognized speech input from the user.
-   *
-   * This function trims the input text, updates the transcript with the user's input,
-   * and checks if the user has issued a command to start the game.
-   *
-   * @param {string} text - The recognized speech text.
-   */
-
-  const handleUserSpeech = (text) => {
-    const trimmedText = text.trim().toLowerCase();
-
-    updateTranscript('User', text);
-
-    if (!gameStartedRef.current && trimmedText.includes('start game')) {
-      setGameStarted(true);
-      handleSystemMessage('The game has started. ' + getSceneDescription(1));
-    } else if (gameStartedRef.current) {
-      if (trimmedText.includes('where')) {
-        console.log('Current scene:', currentScene);
-      
-        // Respond with the current scene description
-        handleSystemMessage(getSceneDescription(currentScene));
-      } else if (trimmedText.includes('go to') && currentScene === 1) {
-      
-        setCurrentScene(2);  // Transition to scene 2
-        currentScene = 2;
-        console.log('Transitioning to scene 2');
-        playAudioAndTransition(2);
-      } else if (trimmedText.includes('yes') && currentScene === 2) {
-        console.log('Transitioning to scene 3');
-        // if (isAudioPlaying) return; // Prevent duplicate audio playback
-        // setCurrentScene(3);
-        // handleSystemMessage(getSceneDescription(3));
-        setCurrentScene(3);  // Transition to scene 2
-        currentScene = 3;
-        console.log('Transitioning to scene 2');
-        playAudioAndTransition(3);
-      } else if (trimmedText.toLowerCase().includes('number') && currentScene === 3) {
-        if (isAudioPlaying) return; // Prevent duplicate audio playback
-        setCurrentScene(1);  // Transition to scene 2
-        currentScene = 1;
-        console.log('Transitioning to scene 1');
-        console.log('Current scene:', currentScene);
-
-      }else if (trimmedText.toLowerCase().includes('use')) {
-          const itemToUse = trimmedText.split('use ')[1]?.trim();
-          if (itemToUse) {
-              // Call useItem function from Inventory
-              const inventoryComponent = document.querySelector('.inventory-container'); // Ensure Inventory has a known class
-              if (inventoryComponent && inventoryComponent.useItem) {
-                  inventoryComponent.useItem(itemToUse);
-              } else {
-                  handleSystemMessage(`You don't have the ability to use items.`);
-              }
-          }
-      } else if (trimmedText.toLowerCase().includes('what items do i have')) {
-          if (inventory.length > 0) {
-              const itemsList = inventory.join(', ');
-              handleSystemMessage(`You have the following items: ${itemsList}.`);
-          } else {
-              handleSystemMessage('Your inventory is empty.');
-          }
-      }
-    } else {
-        handleSystemMessage('Command not recognized. Please repeat.');
-      }
-    }
-  };
-
-
-
-  const playAudioAndTransition = (sceneNumber) => {
-    const audioMap = {
-      2: '/walking.mp3',
-      3: '/transition3.mp3', // Example for scene 3 audio
-    };
-  
-    const audioSrc = audioMap[sceneNumber];
-    if (audioSrc && !isAudioPlaying) {
-      // Ensure mic is off during audio playback
-      speechToTextHandler.handleStopListening({ setIsListening });
-  
-      const audio = new Audio(audioSrc);
-  
-      setIsAudioPlaying(true); // Set audio playing state to true
-  
-      audio.play().catch((err) => console.error('Audio playback error:', err));
-  
-      audio.onended = async () => {
-        setIsAudioPlaying(false); // Reset audio playing state
-        // When audio finishes, handle the next steps
-        if (sceneNumber === 2) {
-          await handleSystemMessage(getSceneDescription(2)); // Announce Scene 2 after audio
-        } else if (sceneNumber === 3) {
-          await handleSystemMessage(getSceneDescription(3)); // Announce Scene 3 after audio
-        }
-        // Start listening again after audio finishes
-        speechToTextHandler.handleStartListening({
-          onResult: handleUserSpeech,
-          setIsListening,
-        });
-      };
-    }
-  };
-  
-  /**
-   * Toggles speech recognition on or off based on the current listening state.
-   *
-   * If speech recognition is not active, it starts listening and sets up the necessary callbacks.
-   * If it is already active, it stops listening to conserve resources and prevent unintended input.
-   */
-
-  const startListening = () => {
-    if (!isListening && !isSpeaking && !isAudioPlaying) {
-      // Ensure mic isn't on during audio playback
-      speechToTextHandler.handleStartListening({
-        onResult: handleUserSpeech,
-        setIsListening,
-      });
-    } else {
-      speechToTextHandler.handleStopListening({ setIsListening });
-    }
-  };
-
-        updateTranscript('User', trimmedText);
-
-        if (trimmedText.toLowerCase().includes('start game')) {
-            if (!gameStartedRef.current) {
-                setGameStarted(true);
-                handleSystemMessage('The game has started!', true); // Mark as announcement.
-            } else {
-                handleSystemMessage('The game has already started.');
-            }
-        }  else if (trimmedText.toLowerCase().includes('use')) {
-        const itemToUse = trimmedText.split('use ')[1]?.trim();
-        if (inventory.includes(itemToUse)) {
-            handleSystemMessage(`You used the ${itemToUse}.`);
-            setInventory(inventory.filter((item) => item !== itemToUse));
         } else {
-            handleSystemMessage(`You don't have a ${itemToUse} in your inventory.`);
-        }
-    } else if (trimmedText.toLowerCase().includes('what items do i have')) {
-        if (inventory.length > 0) {
-            const itemsList = inventory.join(', ');
-            handleSystemMessage(`You have the following items: ${itemsList}.`);
-        } else {
-            handleSystemMessage('Your inventory is empty.');
+            speechToTextHandler.handleStopListening({ setIsListening });
         }
     };
 
-    /**
-     * Toggles speech recognition on or off based on the current listening state.
-     *
-     * If speech recognition is not active, it starts listening and sets up the necessary callbacks.
-     * If it is already active, it stops listening to conserve resources and prevent unintended input.
-     */
+    const getSceneDescription = (sceneNumber) => {
+        switch (sceneNumber) {
+            case 1:
+                return 'You are at a crossroads. Where do you want to go?';
+            case 2:
+                return 'You are at a rushing river. How will you cross?';
+            case 3:
+                return 'You are in a village. What will you do next?';
+            default:
+                return 'Unknown scene.';
+        }
+    };
 
+    return (
+        <div className="game-container">
+            <h1 className="game-title">Adventure Game</h1>
 
-
-return (
-    <div className="game-container">
-        <h1 className="game-title">Adventure Game</h1>
-
-        {/* Display instructions or announcement */}
-        {announcement ? (
-            <p className="announcement">{announcement}</p>
-        ) : (
-            <p className="instruction">
-                Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>,
-                or <strong>&quot;restart game&quot;</strong>.
-            </p>
-        )}
-
-        {/* Button to start or stop listening for speech input */}
-        <button onClick={startListening} className="listen-button">
-            {isListening ? 'Stop Listening' : 'Start Listening'}
-        </button>
-        <hr className="divider" />
-
-        {/* Inventory Component */}
-        <Inventory />
-
-        {/* Component to display the game's transcript */}
-        <GameTranscript transcript={transcript} />
-
-        {/* Game Content Section */}
-        <div className="w-full max-w-4xl bg-gray-800 bg-opacity-90 rounded-lg p-6 shadow-lg text-center">
-            <h1 className="text-4xl font-bold mb-6 text-purple-400">Adventure Game</h1>
-
-            {/* Game Instructions or Scene Manager */}
-            {!gameStarted ? (
-                <p className="text-gray-300 text-lg italic">
-                    Say <span className="text-purple-400 font-bold">Start Game</span> to begin.
-                </p>
+            {announcement ? (
+                <p className="announcement">{announcement}</p>
             ) : (
-                <div className="mt-4">
-                    <SceneManager currentScene={currentScene} />
-                </div>
+                <p className="instruction">
+                    Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>,
+                    or <strong>&quot;restart game&quot;</strong>.
+                </p>
             )}
 
-            {/* Button to Start or Stop Listening */}
-            <button
-                onClick={startListening}
-                className={`mt-6 ${
-                    isListening ? 'bg-red-600 hover:bg-red-700' : 'bg-purple-600 hover:bg-purple-700'
-                } transition-colors text-white font-semibold px-6 py-3 rounded-lg shadow-md text-lg`}
-                disabled={isSpeaking || isAudioPlaying} // Disable listening when audio is playing
-            >
+            <button onClick={startListening} className="listen-button">
                 {isListening ? 'Stop Listening' : 'Start Listening'}
             </button>
+            <hr className="divider" />
+
+            <Inventory />
+            <GameTranscript transcript={transcript} />
+
+            <div className="w-full max-w-4xl bg-gray-800 bg-opacity-90 rounded-lg p-6 shadow-lg text-center">
+                {!gameStarted ? (
+                    <p className="text-gray-300 text-lg italic">
+                        Say <span className="text-purple-400 font-bold">Start Game</span> to begin.
+                    </p>
+                ) : (
+                    <div className="mt-4">
+                        <SceneManager currentScene={currentScene} />
+                    </div>
+                )}
+            </div>
         </div>
-    </div>
-);
+    );
 };
 
 export default Game;
