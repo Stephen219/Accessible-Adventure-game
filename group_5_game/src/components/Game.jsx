@@ -240,7 +240,7 @@ const Game = () => {
      * If speech recognition is not active, it starts listening and sets up the necessary callbacks.
      * If it is already active, it stops listening to conserve resources and prevent unintended input.
      */
-    const startListening = () => {
+    const toggleListening = () => {
         if (!isListening) {
             speechToTextHandler.handleStartListening({
                 onResult: handleUserSpeech,
@@ -252,7 +252,7 @@ const Game = () => {
     };
 
 
-            {/* Display instructions or announcement */}
+    {/* Display instructions or announcement */}
             {announcement ? (
                 <p className="announcement">{announcement}</p>
             ) : (
