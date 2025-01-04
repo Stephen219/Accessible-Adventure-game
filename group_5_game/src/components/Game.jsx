@@ -49,15 +49,8 @@ const Game = () => {
      * @param {string} text - The text to add to the transcript.
      */
 
-    const updateTranscript = (type, text) => {
-        const currentTime = new Date().toLocaleTimeString([], {hour12: false});
-        setTranscript((prev) => [
-            ...prev,
-            {type, text: text.trim(), time: currentTime},
-        ]);
-    };
+    
 
-<<<<<<< group_5_game/src/components/Game.jsx
   const updateTranscript = (type, text) => {
     const currentTime = new Date().toLocaleTimeString([], { hour12: false });
     setTranscript((prev) => [
@@ -88,7 +81,6 @@ const Game = () => {
    * @param {string} message - The system message to process.
    * @param {boolean} [isAnnouncement=false] - Indicates if the message is an important announcement.
    */
-=======
     /**
      * Handles a system-generated message by speaking it aloud and updating the transcript.
      *
@@ -99,7 +91,6 @@ const Game = () => {
      * @param {string} message - The system message to process.
      * @param {boolean} [isAnnouncement=false] - Indicates if the message is an important announcement.
      */
->>>>>>> group_5_game/src/components/Game.jsx
 
 
 
@@ -112,20 +103,12 @@ const Game = () => {
 
         setIsSpeaking(true);
 
-<<<<<<< group_5_game/src/components/Game.jsx
     try {
         // Speak the system message
         // await textToSpeechHandler.speak(message);
         await textToSpeechHandler.speak(message, { rate: speechRate });
     } finally {
         setIsSpeaking(false);
-=======
-        try {
-            // Speak the system message
-            await textToSpeechHandler.speak(message);
-        } finally {
-            setIsSpeaking(false);
->>>>>>> group_5_game/src/components/Game.jsx
 
             // Resume speech recognition only if no audio is playing
             if (!isAudioPlaying) {
@@ -299,7 +282,6 @@ const Game = () => {
         } else {
             speechToTextHandler.handleStopListening({setIsListening});
         }
-<<<<<<< group_5_game/src/components/Game.jsx
     }
 };
 
@@ -368,8 +350,6 @@ const Game = () => {
     const audioMap = {
       2: '/walking.mp3',
       3: '/transition3.mp3', // Example for scene 3 audio
-=======
->>>>>>> group_5_game/src/components/Game.jsx
     };
 
 
@@ -377,7 +357,7 @@ const Game = () => {
     }
     {
         announcement ? (
-            <p className="announcement">{announcement}</p>
+          <p className="announcement">{announcement}</p>
         ) : (
             <p className="instruction">
                 Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>,
@@ -446,7 +426,6 @@ const Game = () => {
 
         {/* Button to Start or Stop Listening */}
         <button
-<<<<<<< group_5_game/src/components/Game.jsx
           onClick={startListening}
           className={`mt-6 bg-${
             isListening ? 'red-600' : 'purple-600'
@@ -454,13 +433,6 @@ const Game = () => {
             isListening ? 'red-700' : 'purple-700'
           } transition-colors text-white font-semibold px-6 py-3 rounded-lg shadow-md text-lg`}
           disabled={isSpeaking || isAudioPlaying} // Dikdddddsable listening when audio is playing
-=======
-            onClick={startListening}
-            className={`mt-6 ${
-                isListening ? 'bg-red-600 hover:bg-red-700' : 'bg-purple-600 hover:bg-purple-700'
-            } transition-colors text-white font-semibold px-6 py-3 rounded-lg shadow-md text-lg`}
-            disabled={isSpeaking || isAudioPlaying} // Disable listening when audio is playing
->>>>>>> group_5_game/src/components/Game.jsx
         >
             {isListening ? 'Stop Listening' : 'Start Listening'}
         </button>
