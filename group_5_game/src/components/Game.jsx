@@ -195,16 +195,17 @@ const Game = () => {
     }
   };
 
-        updateTranscript('User', trimmedText);
+    updateTranscript('User', trimmedText);
 
-        if (trimmedText.toLowerCase().includes('start game')) {
-            if (!gameStartedRef.current) {
-                setGameStarted(true);
-                handleSystemMessage('The game has started!', true); // Mark as announcement.
-            } else {
-                handleSystemMessage('The game has already started.');
-            }
-        }  else if (trimmedText.toLowerCase().includes('use')) {
+    if (trimmedText.toLowerCase().includes('start game')) {
+        if (!gameStartedRef.current) {
+            setGameStarted(true);
+            handleSystemMessage('The game has started!', true); // Mark as announcement.
+        } else {
+            handleSystemMessage('The game has already started.');
+        }
+    }
+    else if (trimmedText.toLowerCase().includes('use')) {
         const itemToUse = trimmedText.split('use ')[1]?.trim();
         if (inventory.includes(itemToUse)) {
             handleSystemMessage(`You used the ${itemToUse}.`);
@@ -212,26 +213,26 @@ const Game = () => {
         } else {
             handleSystemMessage(`You don't have a ${itemToUse} in your inventory.`);
         }
-        // Stop the game
-        else if (trimmedText.toLowerCase().includes('stop game'))
+    }
+// Stop the game
+    else if (trimmedText.toLowerCase().includes('stop game')) {
+        if (gameStartedRef.current) {
+            setGameStarted(false);
+            handleSystemMessage('The game has been stopped.', true);
+        } else {
+            handleSystemMessage('The game is not currently running.');
+        }
+    }
+// Restart the game
+    else if (trimmedText.toLowerCase().includes('restart game')) {
+        if (gameStartedRef.current) {
+            handleSystemMessage('Restarting the game.', true);
+        } else {
+            handleSystemMessage('Starting the game.', true);
+        }
+        setGameStarted(true);
+    }
 
-            if (gameStartedRef.current) {
-                setGameStarted(false);
-                handleSystemMessage('The game has been stopped.', true);
-            } else {
-                handleSystemMessage('The game is not currently running.');
-            }
-        }
-        // Restart the game
-        else if (trimmedText.toLowerCase().includes('restart game')) {
-            if (gameStartedRef.current) {
-                handleSystemMessage('Restarting the game.', true);
-            } else {
-                handleSystemMessage('Starting the game.', true);
-            }
-            setGameStarted(true);
-        }
-    };
 
     /**
      * Toggles speech recognition on or off based on the current listening state.
