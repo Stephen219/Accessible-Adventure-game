@@ -154,9 +154,10 @@ const Game = () => {
                 <p className="announcement">{announcement}</p>
             ) : (
                 <p className="instruction">
-                    Say <strong>&quot;start game&quot;</strong> to begin the game.
+                    Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>, or <strong>&quot;restart game&quot;</strong>.
                 </p>
             )}
+
 
             {/* Button to start or stop listening for speech input. */}
             <button onClick={startListening} className="listen-button">
