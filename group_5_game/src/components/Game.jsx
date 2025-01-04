@@ -240,33 +240,33 @@ const Game = () => {
         }
     };
 
-let announcement;
-return (
-    <div className="game-container">
-        <h1 className="game-title">Adventure Game</h1>
 
-        {/* Display instructions or announcement */}
-        {announcement ? (
-            <p className="announcement">{announcement}</p>
-        ) : (
-            <p className="instruction">
-                Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>, or <strong>&quot;restart game&quot;</strong>.
-            </p>
-        )}
-
-        {/* Button to start or stop listening for speech input */}
-        <button onClick={startListening} className="listen-button">
-            {isListening ? 'Stop Listening' : 'Start Listening'}
-        </button>
-        <hr className="divider" />
-
-        {/* Inventory Component */}
-        <Inventory />
-
-        {/* Component to display the game's transcript */}
-        <GameTranscript transcript={transcript} />
-    </div>
-)
+// return (
+//     <div className="game-container">
+//         <h1 className="game-title">Adventure Game</h1>
+//
+//         {/* Display instructions or announcement */}
+//         {announcement ? (
+//             <p className="announcement">{announcement}</p>
+//         ) : (
+//             <p className="instruction">
+//                 Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>, or <strong>&quot;restart game&quot;</strong>.
+//             </p>
+//         )}
+//
+//         {/* Button to start or stop listening for speech input */}
+//         <button onClick={startListening} className="listen-button">
+//             {isListening ? 'Stop Listening' : 'Start Listening'}
+//         </button>
+//         <hr className="divider" />
+//
+//         {/* Inventory Component */}
+//         <Inventory />
+//
+//         {/* Component to display the game's transcript */}
+//         <GameTranscript transcript={transcript} />
+//     </div>
+// )
 
       </div>
 
