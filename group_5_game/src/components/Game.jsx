@@ -238,9 +238,7 @@ const Game = () => {
         } else {
             handleSystemMessage('Your inventory is empty.');
         }
-    }
-
-};
+    };
 
     /**
      * Toggles speech recognition on or off based on the current listening state.
