@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from './firebaseConfig';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
