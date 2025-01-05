@@ -12,10 +12,13 @@
   },
   "dependencies": {
     "@firebase/firestore": "^4.7.4",
+    "class-variance-authority": "^0.7.1",
     "firebase": "^11.0.1",
+    "lucide-react": "^0.469.0",
     "next": "15.0.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
