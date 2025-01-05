@@ -3,7 +3,8 @@ import "./globals.css";
 import React from "react";
 // import NavbarSimple from "../components/header";
 import Header from '../components/Header';
-import { SettingsProvider } from "../context/SettingsContext";
+import { AuthProvider } from '@/utils/AuthContext';
+
 
 
 export const metadata = {
@@ -20,13 +21,12 @@ export default function RootLayout({ children }) {
         <title>Adventure Game</title>
       </head>
       <body className="bg-[#0a0a0a] text-white min-h-screen flex flex-col">
-      <SettingsProvider>
         <Header />
         <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {children}
+        <AuthProvider>{children}</AuthProvider>
         </main>
-      </SettingsProvider>
-      </body>
+    </body>
+      
     </html>
   );
 }

@@ -1,32 +1,107 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+// import { auth } from '../utils/firebaseConfig'; // Ensure the path is correct
+// import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 
 export default function Home() {
   const router = useRouter();
 
+  // State Management
+  const [isCreateAccountModalOpen, setCreateAccountModalOpen] = useState(false);
+  const [isLoginModalOpen, setLoginModalOpen] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [username, setUsername] = useState('');
+  const [error, setError] = useState('');
+
+  // Guest Login Handler
   const handleGuestLogin = () => {
-    router.push('/game'); // Redirect to the filler page
+    router.push('/game'); // Redirect to game page
+  };
+
+  // Create Account Handler (Mocked with Firebase Functionality Commented Out)
+  const handleCreateAccount = (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    // Uncomment this block to enable Firebase functionality
+    /*
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      console.log('User created:', user);
+      alert('Account created successfully! Please log in.');
+      setCreateAccountModalOpen(false); // Close the modal
+    } catch (error) {
+      console.error('Error creating account:', error.message);
+      setError(error.message || 'Failed to create account. Please try again.');
+    }
+    */
+
+    // Mocked Logic for Testing
+    console.log(`Mock account created for ${email}`);
+    alert('Account created successfully! Please log in.');
+    setCreateAccountModalOpen(false); // Close the modal
+  };
+
+  // Login Handler (Mocked with Firebase Functionality Commented Out)
+  const handleLogin = (e) => {
+    e.preventDefault();
+    setError('');
+
+    // Uncomment this block to enable Firebase functionality
+    /*
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      console.log('Logged in user:', user);
+      alert(`Welcome back, ${user.email}!`);
+      router.push('/game'); // Redirect to game page
+    } catch (error) {
+      console.error('Error logging in:', error.message);
+      setError(error.message || 'Invalid email or password.');
+    }
+    */
+
+    // Mocked Logic for Testing
+    if (email === 'testuser@example.com' && password === 'testpassword') {
+      alert('Login successful!');
+      router.push('/game'); // Redirect to game page
+    } else {
+      setError('Invalid email or password.');
+    }
   };
 
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
       <h1>Welcome to [App Name]</h1>
+
+      {/* Guest Login Button */}
+      <button
+        style={{
+          padding: '20px',
+          fontSize: '18px',
+          backgroundColor: '#4CAF50',
+          color: 'white',
+          border: 'none',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          marginBottom: '20px',
+        }}
+        onClick={handleGuestLogin}
+      >
+        Login as Guest
+      </button>
+
       <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '30px' }}>
-        <button
-          style={{
-            padding: '20px',
-            fontSize: '18px',
-            backgroundColor: '#4CAF50',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-          }}
-          onClick={handleGuestLogin} // Call the function to redirect
-        >
-          Login as Guest
-        </button>
+        {/* Login Button */}
         <button
           style={{
             padding: '20px',
@@ -37,118 +112,203 @@ export default function Home() {
             borderRadius: '8px',
             cursor: 'pointer',
           }}
-          onClick={() => alert('Login as User functionality not implemented yet!')}
+          onClick={() => setLoginModalOpen(true)}
         >
           Login as User
         </button>
+
+        {/* Create Account Button */}
+        <button
+          style={{
+            padding: '20px',
+            fontSize: '18px',
+            backgroundColor: '#f39c12',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+          }}
+          onClick={() => setCreateAccountModalOpen(true)}
+        >
+          Create an Account
+        </button>
       </div>
+
+      {/* Login Modal */}
+      {isLoginModalOpen && (
+        <div style={modalStyle}>
+          <h2>Login</h2>
+          <form onSubmit={handleLogin}>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            <input
+              type="email"
+              placeholder="Email"
+              style={inputStyle}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              style={inputStyle}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <button
+              type="submit"
+              style={{
+                padding: '10px 20px',
+                fontSize: '16px',
+                backgroundColor: '#4CAF50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                marginTop: '10px',
+              }}
+            >
+              Login
+            </button>
+          </form>
+          <button
+            style={{
+              padding: '10px 20px',
+              fontSize: '16px',
+              backgroundColor: '#FF4D4D',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              marginTop: '10px',
+            }}
+            onClick={() => setLoginModalOpen(false)}
+          >
+            Close
+          </button>
+        </div>
+      )}
+
+      {/* Create Account Modal */}
+      {isCreateAccountModalOpen && (
+        <div style={modalStyle}>
+          <h2>Create Account</h2>
+          <form onSubmit={handleCreateAccount}>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            <input
+              type="text"
+              placeholder="Username"
+              style={inputStyle}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              style={inputStyle}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              style={inputStyle}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Confirm Password"
+              style={inputStyle}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+            <button
+              type="submit"
+              style={{
+                padding: '10px 20px',
+                fontSize: '16px',
+                backgroundColor: '#4CAF50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                marginTop: '10px',
+              }}
+            >
+              Create Account
+            </button>
+          </form>
+          <button
+            style={{
+              padding: '10px 20px',
+              fontSize: '16px',
+              backgroundColor: '#FF4D4D',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              marginTop: '10px',
+            }}
+            onClick={() => setCreateAccountModalOpen(false)}
+          >
+            Close
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
+// Modal Styles
+const modalStyle = {
+  position: 'fixed',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  padding: '20px',
+  backgroundColor: 'white',
+  boxShadow: '0 0 10px rgba(0, 0, 0, 0.25)',
+  zIndex: 1000,
+  textAlign: 'center',
+  borderRadius: '8px',
+};
+
+const inputStyle = {
+  display: 'block',
+  width: '100%',
+  margin: '10px 0',
+  padding: '10px',
+  fontSize: '16px',
+};
 
 
 
 
-// import Image from "next/image";
-// import React from "react";
+// testing the connection
+// 'use client';
+// import React, { useEffect } from 'react';
+// import { auth } from '../utils/firebaseConfig'; // Ensure the path is correct
+// import { getAuth } from 'firebase/auth';
 
-// export default function Home() {
+// export default function FirebaseTest() {
+//   useEffect(() => {
+//     try {
+//       const testAuth = getAuth();
+//       console.log('Firebase is connected:', testAuth);
+//     } catch (error) {
+//       console.error('Firebase connection error:', error.message);
+//     }
+//   }, []);
+
 //   return (
-//     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-//       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-//         <Image
-//           className="dark:invert"
-//           src="/next.svg"
-//           alt="Next.js logo"
-//           width={180}
-//           height={38}
-//           priority
-//         />
-//         <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-//           <li className="mb-2">
-//             Get started by editing{" "}
-//             <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-//               src/app/page.js
-//             </code>
-//             .
-//           </li>
-//           <li>Save and see your changes instantly.</li>
-//         </ol>
-
-//         <div className="flex gap-4 items-center flex-col sm:flex-row">
-//           <a
-//             className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-//             href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-//             target="_blank"
-//             rel="noopener noreferrer"
-//           >
-//             <Image
-//               className="dark:invert"
-//               src="/vercel.svg"
-//               alt="Vercel logomark"
-//               width={20}
-//               height={20}
-//             />
-//             Deploy now
-//           </a>
-//           <a
-//             className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-//             href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-//             target="_blank"
-//             rel="noopener noreferrer"
-//           >
-//             Read our docs
-//           </a>
-//         </div>
-//       </main>
-//       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-//         <a
-//           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-//           href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           <Image
-//             aria-hidden
-//             src="/file.svg"
-//             alt="File icon"
-//             width={16}
-//             height={16}
-//           />
-//           Learn
-//         </a>
-//         <a
-//           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-//           href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           <Image
-//             aria-hidden
-//             src="/window.svg"
-//             alt="Window icon"
-//             width={16}
-//             height={16}
-//           />
-//           Examples
-//         </a>
-//         <a
-//           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-//           href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           <Image
-//             aria-hidden
-//             src="/globe.svg"
-//             alt="Globe icon"
-//             width={16}
-//             height={16}
-//           />
-//           Go to nextjs.org →
-//         </a>
-//       </footer>
+//     <div>
+//       <h1>Testing Firebase Connection</h1>
 //     </div>
 //   );
 // }
