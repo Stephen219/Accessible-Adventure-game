@@ -6,7 +6,9 @@ import { speechToTextHandler } from '@/components/handlers/speech_TextHandler';
 import { textToSpeechHandler } from '@/components/handlers/text_SpeechHandler';
 import GameTranscript from '@/components/GameTranscript';
 import Inventory from '@/components/Inventory';
-
+// TODO : Add use of inventory
+// Todo add more scenes 
+// FIXME : add an introductory vice over
 
 /**
  * Game Component
@@ -168,8 +170,8 @@ const Game = () => {
 
     const playAudioAndTransition = (sceneNumber) => {
         const audioMap = {
-            2: '/walking.mp3',
-            3: '/transition3.mp3', // Example for scene 3 audio
+            2: '/audios/running.mp3',
+            3: 'audios/running.mp3', 
         };
 
         const audioSrc = audioMap[sceneNumber];
