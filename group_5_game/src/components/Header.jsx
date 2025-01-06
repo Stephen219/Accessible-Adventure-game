@@ -50,10 +50,10 @@ export default function Header() {
             </Link>
             <Link
               key="settings"
-              href="#"
+              href="/settings"
               className="text-gray-300 hover:text-[#9333EA] transition-colors duration-200 text-sm md:text-base"
             >
-              <span className="text-xl">settings</span>
+              <span className="text-xl">Settings</span>
             </Link>
           </nav>
         </div>
