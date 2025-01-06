@@ -3,7 +3,8 @@ import "./globals.css";
 import React from "react";
 // import NavbarSimple from "../components/header";
 import Header from '../components/Header';
-import { AuthProvider } from '@/utils/AuthContext';
+import { AuthProvider } from '@/utils/AuthContext'
+import { SettingsProvider } from "../context/SettingsContext";
 
 
 
@@ -21,10 +22,12 @@ export default function RootLayout({ children }) {
         <title>Adventure Game</title>
       </head>
       <body className="bg-[#0a0a0a] text-white min-h-screen flex flex-col">
+      <SettingsProvider>
         <Header />
         <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <AuthProvider>{children}</AuthProvider>
         </main>
+          </SettingsProvider>
     </body>
       
     </html>
