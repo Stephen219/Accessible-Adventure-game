@@ -3,13 +3,11 @@ import React from 'react';
 const Scene3 = () => {
     return (
         <div>
-            <h2>Scene 3: Village</h2>
+            <h2>Scene 3: stuck on crossroads</h2>
             <p>
-                You arrive at a quaint village bathed in warm sunlight. The cobblestone streets are 
-                lined with small cottages, each with a garden of blooming flowers. Villagers greet 
-                you warmly, inviting you to rest and share a meal.
+            You are stuck at a crossroads, with four paths stretching in different directions, and you have no idea which way to go. Thankfully, you have a compass, a stick, a matchstick, and some rope. What should you use to find the right path?
             </p>
-            <p>What will you do next? Say "go to Scene 1" to return to the crossroads or "go to Scene 2" to head into the forest.</p>
+            <p> Say what you want to use to find the right path</p>
         </div>
     );
 };
