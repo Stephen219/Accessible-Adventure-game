@@ -1,5 +1,4 @@
 
-
 import React, { useState, useRef, useEffect } from 'react';
 import '@/components/css/Game.css';
 import SceneManager from './SceneManager.jsx';
