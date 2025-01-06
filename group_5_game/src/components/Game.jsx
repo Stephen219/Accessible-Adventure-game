@@ -142,6 +142,9 @@ const Game = () => {
                 handleSystemMessage(getSceneDescription(currentScene));
             } else if (trimmedText.includes('go to') && currentScene === 1) {
 
+            } else if (trimmedText.includes('instructions')) {
+                speakInstructions();  // Trigger the instructions
+
                 setCurrentScene(2);  // Transition to scene 2
                 currentScene = 2;
                 console.log('Transitioning to scene 2');
@@ -237,6 +240,26 @@ const Game = () => {
 
     };
 
+    const voiceCommands = [
+        { command: "Start Game", description: "Starts the game." },
+        { command: "Go Faster", description: "Makes the text-to-speech speech faster." },
+        { command: "Go Slower", description: "Makes the text-to-speech speech slower." },
+        { command: "Where", description: "Tells you where you currently are in the game." },
+        { command: "Go to", description: "Takes you to a specific scene in the game." },
+        { command: "Yes", description: "Confirms your action." },
+        { command: "No", description: "Cancels the current action." },
+    ];
+
+
+    const speakInstructions = () => {
+        const instructionsText = voiceCommands.map(
+            (command) => `${command.command}: ${command.description}`
+        ).join('. ');
+
+        handleSystemMessage(instructionsText);
+    };
+
+
     /**
      * Toggles speech recognition on or off based on the current listening state.
      *
@@ -255,7 +278,7 @@ const Game = () => {
             ) : (
                 <p className="instruction">
                     Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>,
-                    or <strong>&quot;restart game&quot;</strong>.
+                    <strong>&quot;restart game&quot;</strong> or <strong>&quot;instructions&quot;</strong>.
                 </p>
             )}
 
