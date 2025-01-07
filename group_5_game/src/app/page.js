@@ -1,28 +1,57 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-// import { auth } from '../utils/firebaseConfig'; // Ensure the path is correct
-// import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { signUpWithEmail, loginWithEmail } from '../utils/authService'; 
+import { useAuthContext } from '../utils/AuthContext'; 
 
 export default function Home() {
   const router = useRouter();
+  const { user } = useAuthContext(); 
 
   // State Management
   const [isCreateAccountModalOpen, setCreateAccountModalOpen] = useState(false);
   const [isLoginModalOpen, setLoginModalOpen] = useState(false);
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [username, setUsername] = useState('');
   const [error, setError] = useState('');
+
+  const [displayedText, setDisplayedText] = useState(''); // For typing effect
+  const [cursorVisible, setCursorVisible] = useState(true); // For blinking cursor
+  const fullText = 'Adventure Game'; // The full text to type out
+
+  // // Typing effect for dynamically displaying the "Adventure Game" title
+  useEffect(() => {
+    let currentIndex = 0;
+    const typingInterval = setInterval(() => {
+      if (currentIndex < fullText.length) {
+        setDisplayedText(fullText.slice(0, currentIndex + 1));
+        currentIndex++;
+      } else {
+        clearInterval(typingInterval);
+      }
+    }, 150);
+
+    return () => clearInterval(typingInterval);
+  }, []);
+
+  // Blinking cursor effect
+  useEffect(() => {
+    const cursorInterval = setInterval(() => {
+      setCursorVisible((prev) => !prev);
+    }, 500);
+
+    return () => clearInterval(cursorInterval);
+  }, []);
 
   // Guest Login Handler
   const handleGuestLogin = () => {
-    router.push('/game'); // Redirect to game page
+    router.push('/game'); // Redirect to the game page
   };
 
-  // Create Account Handler (Mocked with Firebase Functionality Commented Out)
-  const handleCreateAccount = (e) => {
+  // Create Account Handler using Firebase Authentication
+  const handleCreateAccount = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -31,113 +60,63 @@ export default function Home() {
       return;
     }
 
-    // Uncomment this block to enable Firebase functionality
-    /*
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      const user = await signUpWithEmail(email, password); 
       console.log('User created:', user);
+
+      // Optionally handle additional actions, like saving the username in Firestore
       alert('Account created successfully! Please log in.');
       setCreateAccountModalOpen(false); // Close the modal
     } catch (error) {
       console.error('Error creating account:', error.message);
       setError(error.message || 'Failed to create account. Please try again.');
     }
-    */
-
-    // Mocked Logic for Testing
-    console.log(`Mock account created for ${email}`);
-    alert('Account created successfully! Please log in.');
-    setCreateAccountModalOpen(false); // Close the modal
   };
 
-  // Login Handler (Mocked with Firebase Functionality Commented Out)
-  const handleLogin = (e) => {
+  // Login Handler using Firebase Authentication
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
 
-    // Uncomment this block to enable Firebase functionality
-    /*
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      const user = await loginWithEmail(email, password); 
       console.log('Logged in user:', user);
+
       alert(`Welcome back, ${user.email}!`);
-      router.push('/game'); // Redirect to game page
+      router.push('/game'); // Redirect to the game page
     } catch (error) {
       console.error('Error logging in:', error.message);
       setError(error.message || 'Invalid email or password.');
     }
-    */
-
-    // Mocked Logic for Testing
-    if (email === 'testuser@example.com' && password === 'testpassword') {
-      alert('Login successful!');
-      router.push('/game'); // Redirect to game page
-    } else {
-      setError('Invalid email or password.');
-    }
   };
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>Welcome to [App Name]</h1>
+    <div style={containerStyle}>
+      {/* Title with Typing Effect */}
+      <div style={{ fontFamily: 'monospace', fontSize: '24px', marginBottom: '20px' }}>
+        <span>{displayedText}</span>
+        {cursorVisible && <span style={{ display: 'inline-block', width: '10px' }}>|</span>}
+      </div>
 
-      {/* Guest Login Button */}
-      <button
-        style={{
-          padding: '20px',
-          fontSize: '18px',
-          backgroundColor: '#4CAF50',
-          color: 'white',
-          border: 'none',
-          borderRadius: '8px',
-          cursor: 'pointer',
-          marginBottom: '20px',
-        }}
-        onClick={handleGuestLogin}
-      >
-        Login as Guest
-      </button>
-
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '30px' }}>
-        {/* Login Button */}
-        <button
-          style={{
-            padding: '20px',
-            fontSize: '18px',
-            backgroundColor: '#008CBA',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-          }}
-          onClick={() => setLoginModalOpen(true)}
-        >
+      {/* Login Options */}
+      <div style={buttonContainerStyle}>
+        <button style={buttonStyle} onClick={handleGuestLogin}>
+          Login as Guest
+        </button>
+        <button style={buttonStyle} onClick={() => setLoginModalOpen(true)}>
           Login as User
         </button>
-
-        {/* Create Account Button */}
-        <button
-          style={{
-            padding: '20px',
-            fontSize: '18px',
-            backgroundColor: '#f39c12',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-          }}
-          onClick={() => setCreateAccountModalOpen(true)}
-        >
-          Create an Account
-        </button>
       </div>
+
+      {/* Create Account Link */}
+      <p style={linkStyle} onClick={() => setCreateAccountModalOpen(true)}>
+        Create an Account
+      </p>
 
       {/* Login Modal */}
       {isLoginModalOpen && (
         <div style={modalStyle}>
-          <h2>Login</h2>
+          <h2 style={{ color: '#000' }}>Login</h2>
           <form onSubmit={handleLogin}>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <input
@@ -156,35 +135,11 @@ export default function Home() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <button
-              type="submit"
-              style={{
-                padding: '10px 20px',
-                fontSize: '16px',
-                backgroundColor: '#4CAF50',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                marginTop: '10px',
-              }}
-            >
+            <button type="submit" style={modalButtonStyle}>
               Login
             </button>
           </form>
-          <button
-            style={{
-              padding: '10px 20px',
-              fontSize: '16px',
-              backgroundColor: '#FF4D4D',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              marginTop: '10px',
-            }}
-            onClick={() => setLoginModalOpen(false)}
-          >
+          <button style={closeButtonStyle} onClick={() => setLoginModalOpen(false)}>
             Close
           </button>
         </div>
@@ -193,7 +148,7 @@ export default function Home() {
       {/* Create Account Modal */}
       {isCreateAccountModalOpen && (
         <div style={modalStyle}>
-          <h2>Create Account</h2>
+          <h2 style={{ color: '#000' }}>Create Account</h2>
           <form onSubmit={handleCreateAccount}>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <input
@@ -228,35 +183,11 @@ export default function Home() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
-            <button
-              type="submit"
-              style={{
-                padding: '10px 20px',
-                fontSize: '16px',
-                backgroundColor: '#4CAF50',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                marginTop: '10px',
-              }}
-            >
+            <button type="submit" style={modalButtonStyle}>
               Create Account
             </button>
           </form>
-          <button
-            style={{
-              padding: '10px 20px',
-              fontSize: '16px',
-              backgroundColor: '#FF4D4D',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              marginTop: '10px',
-            }}
-            onClick={() => setCreateAccountModalOpen(false)}
-          >
+          <button style={closeButtonStyle} onClick={() => setCreateAccountModalOpen(false)}>
             Close
           </button>
         </div>
@@ -265,7 +196,37 @@ export default function Home() {
   );
 }
 
-// Modal Styles
+// Styles
+const containerStyle = {
+  textAlign: 'center',
+  marginTop: '50px',
+};
+
+const buttonContainerStyle = {
+  display: 'flex',
+  justifyContent: 'center',
+  gap: '20px',
+  marginTop: '30px',
+};
+
+const buttonStyle = {
+  padding: '20px',
+  fontSize: '18px',
+  backgroundColor: '#4CAF50',
+  color: 'white',
+  border: 'none',
+  borderRadius: '8px',
+  cursor: 'pointer',
+};
+
+const linkStyle = {
+  marginTop: '20px',
+  fontSize: '16px',
+  color: '#FFFFFF',
+  textDecoration: 'underline',
+  cursor: 'pointer',
+};
+
 const modalStyle = {
   position: 'fixed',
   top: '50%',
@@ -285,30 +246,32 @@ const inputStyle = {
   margin: '10px 0',
   padding: '10px',
   fontSize: '16px',
+  color: '#000',
+  backgroundColor: '#fff',
+  border: '1px solid #ccc',
+  borderRadius: '4px',
+  outline: 'none',
 };
 
+const modalButtonStyle = {
+  padding: '10px 20px',
+  fontSize: '16px',
+  backgroundColor: '#4CAF50',
+  color: 'white',
+  border: 'none',
+  borderRadius: '8px',
+  cursor: 'pointer',
+  marginTop: '10px',
+};
 
+const closeButtonStyle = {
+  padding: '10px 20px',
+  fontSize: '16px',
+  backgroundColor: '#FF4D4D',
+  color: 'white',
+  border: 'none',
+  borderRadius: '8px',
+  cursor: 'pointer',
+  marginTop: '10px',
+};
 
-
-// testing the connection
-// 'use client';
-// import React, { useEffect } from 'react';
-// import { auth } from '../utils/firebaseConfig'; // Ensure the path is correct
-// import { getAuth } from 'firebase/auth';
-
-// export default function FirebaseTest() {
-//   useEffect(() => {
-//     try {
-//       const testAuth = getAuth();
-//       console.log('Firebase is connected:', testAuth);
-//     } catch (error) {
-//       console.error('Firebase connection error:', error.message);
-//     }
-//   }, []);
-
-//   return (
-//     <div>
-//       <h1>Testing Firebase Connection</h1>
-//     </div>
-//   );
-// }
