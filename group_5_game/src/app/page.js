@@ -1,6 +1,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { auth } from '../utils/firebaseConfig'; // Ensure the correct path
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 
 export default function Home() {
   const router = useRouter();
@@ -15,34 +17,32 @@ export default function Home() {
   const [error, setError] = useState('');
 
   const [displayedText, setDisplayedText] = useState(''); // For typing effect
-const [cursorVisible, setCursorVisible] = useState(true); // For blinking cursor
+  const [cursorVisible, setCursorVisible] = useState(true); // For blinking cursor
   const fullText = 'Adventure Game'; // The full text to type out
 
 // Typing effect
 useEffect(() => {
-  if (fullText) {
-    let currentIndex = 0;
-    const typingInterval = setInterval(() => {
-      if (currentIndex < fullText.length) {
-        setDisplayedText(fullText.slice(0, currentIndex + 1));
-        currentIndex++;
-      } else {
-        clearInterval(typingInterval);
-      }
-    }, 150); // Typing speed
+  let currentIndex = 0;
+  const typingInterval = setInterval(() => {
+    if (currentIndex < fullText.length) {
+      setDisplayedText(fullText.slice(0, currentIndex + 1)); // Dynamically slice the text
+      currentIndex++;
+    } else {
+      clearInterval(typingInterval);
+    }
+  }, 150); // Typing speed
 
-    return () => clearInterval(typingInterval);
-  }
-}, [fullText]); // Ensure fullText is a dependency
+  return () => clearInterval(typingInterval);
+}, []); // fullText is static, so no need to add it as a dependency
 
-// Blinking cursor effect
-useEffect(() => {
-  const cursorInterval = setInterval(() => {
-    setCursorVisible((prev) => !prev);
-  }, 500); // Blinking speed
+  // Blinking cursor effect
+  useEffect(() => {
+    const cursorInterval = setInterval(() => {
+      setCursorVisible((prev) => !prev);
+    }, 500); // Blinking speed
 
-  return () => clearInterval(cursorInterval);
-}, []);
+    return () => clearInterval(cursorInterval);
+  }, []);
 
   // Guest Login Handler
   const handleGuestLogin = () => {
@@ -50,7 +50,7 @@ useEffect(() => {
   };
 
   // Create Account Handler
-  const handleCreateAccount = (e) => {
+  const handleCreateAccount = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -59,33 +59,45 @@ useEffect(() => {
       return;
     }
 
-    // Mocked Logic for Testing
-    console.log(`Mock account created for ${email}`);
-    alert('Account created successfully! Please log in.');
-    setCreateAccountModalOpen(false);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      console.log('User created:', user);
+
+      // Optionally save additional user data to a database (if required)
+      alert('Account created successfully! Please log in.');
+      setCreateAccountModalOpen(false); // Close the modal
+    } catch (error) {
+      console.error('Error creating account:', error.message);
+      setError(error.message || 'Failed to create account. Please try again.');
+    }
   };
 
   // Login Handler
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
 
-    // Mocked Logic for Testing
-    if (email === 'testuser@example.com' && password === 'testpassword') {
-      alert('Login successful!');
-      router.push('/game');
-    } else {
-      setError('Invalid email or password.');
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      console.log('Logged in user:', user);
+
+      alert(`Welcome back, ${user.email}!`);
+      router.push('/game'); // Redirect to game page
+    } catch (error) {
+      console.error('Error logging in:', error.message);
+      setError(error.message || 'Invalid email or password.');
     }
   };
 
   return (
     <div style={containerStyle}>
-    {/* Title with Typing Effect */}
-    <div style={{ fontFamily: 'monospace', fontSize: '24px', marginBottom: '20px' }}>
-      <span>{displayedText}</span>
-      {cursorVisible && <span style={{ display: 'inline-block', width: '10px' }}>|</span>}
-    </div>
+      {/* Title with Typing Effect */}
+      <div style={{ fontFamily: 'monospace', fontSize: '24px', marginBottom: '20px' }}>
+        <span>{displayedText}</span>
+        {cursorVisible && <span style={{ display: 'inline-block', width: '10px' }}>|</span>}
+      </div>
 
       {/* Login Options */}
       <div style={buttonContainerStyle}>
@@ -98,17 +110,14 @@ useEffect(() => {
       </div>
 
       {/* Create Account Link */}
-      <p
-        style={linkStyle}
-        onClick={() => setCreateAccountModalOpen(true)}
-      >
+      <p style={linkStyle} onClick={() => setCreateAccountModalOpen(true)}>
         Create an Account
       </p>
 
       {/* Login Modal */}
       {isLoginModalOpen && (
         <div style={modalStyle}>
-          <h2 style={{ color: '#000' }}>Login</h2> {/* Header color changed to black */}
+          <h2 style={{ color: '#000' }}>Login</h2>
           <form onSubmit={handleLogin}>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <input
@@ -140,7 +149,7 @@ useEffect(() => {
       {/* Create Account Modal */}
       {isCreateAccountModalOpen && (
         <div style={modalStyle}>
-          <h2 style={{ color: '#000' }}>Create Account</h2> {/* Header color changed to black */}
+          <h2 style={{ color: '#000' }}>Create Account</h2>
           <form onSubmit={handleCreateAccount}>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <input
@@ -273,7 +282,7 @@ const inputStyle = {
   backgroundColor: '#fff',
   border: '1px solid #ccc',
   borderRadius: '4px',
-  outline: 'none', // Removes default blue outline
+  outline: 'none',
 };
 
 const inputFocusStyle = {
@@ -302,4 +311,3 @@ const closeButtonStyle = {
   cursor: 'pointer',
   marginTop: '10px',
 };
-
