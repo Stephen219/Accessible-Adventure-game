@@ -1,11 +1,6 @@
-
-import "./globals.css";
-import React from "react";
-// import NavbarSimple from "../components/header";
-import Header from '../components/Header';
+import './globals.css';
 import { AuthProvider } from '@/utils/AuthContext';
-
-
+import Header from '@/components/Header';
 
 export const metadata = {
   title: 'Adventure Game',
@@ -21,22 +16,21 @@ export const metadata = {
   },
 };
 
-
 export default function RootLayout({ children }) {
-
   return (
     <html lang="en" className="dark">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Adventure Game</title>
+        <title>{metadata.title}</title>
       </head>
       <body className="bg-[#0a0a0a] text-white min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <AuthProvider>{children}</AuthProvider>
-        </main>
-    </body>
-      
+        <AuthProvider>
+          <Header />
+          <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {children}
+          </main>
+        </AuthProvider>
+      </body>
     </html>
   );
 }

@@ -1,52 +1,53 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { getUserCoins } from '@/utils/userService';
+import { useAuth } from '@/utils/AuthContext';
 
-const ShopModal = ({ onClose }) => {
+export default function ShopModal({ onClose }) {
+  const [coins, setCoins] = useState(0);
+  const { currentUser } = useAuth(); // Correct hook usage
+
+  useEffect(() => {
+    async function fetchCoins() {
+      if (currentUser?.uid) {
+        const userCoins = await getUserCoins(currentUser.uid);
+        setCoins(userCoins);
+      }
+    }
+
+    fetchCoins();
+  }, [currentUser]);
+
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-      role="dialog"
-      aria-modal="true"
-    >
-      <div className="bg-white rounded-lg shadow-lg p-6 max-w-lg w-full">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white rounded-lg p-6 max-w-sm w-full">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Shop</h2>
+          <h2 className="text-xl font-semibold">Shop</h2>
           <button
             onClick={onClose}
-            className="text-red-500 text-lg font-semibold hover:text-red-700"
-            aria-label="Close shop modal"
+            className="text-red-500 font-bold text-lg"
           >
             ✕
           </button>
         </div>
+        <p className="text-gray-700 mb-4">
+          <strong>Coins:</strong> {coins}
+        </p>
         <div>
-          <p className="mb-4 text-gray-600">
-            <strong>Coins:</strong> Placeholder
-          </p>
-          <ul className="space-y-3">
-            <li className="flex justify-between items-center">
-              <span>Item 1 - 10 Coins</span>
-              <button className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">
-                Buy
-              </button>
-            </li>
-            <li className="flex justify-between items-center">
-              <span>Item 2 - 20 Coins</span>
-              <button className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">
-                Buy
-              </button>
-            </li>
-          </ul>
+          <button className="bg-blue-500 text-white px-4 py-2 rounded">
+            Buy Item 1
+          </button>
+          <button className="bg-blue-500 text-white px-4 py-2 rounded ml-2">
+            Buy Item 2
+          </button>
         </div>
       </div>
     </div>
   );
-};
+}
 
 ShopModal.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
-
-export default ShopModal;
