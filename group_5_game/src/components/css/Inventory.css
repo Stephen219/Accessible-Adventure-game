@@ -1,0 +1,65 @@
+/* General Inventory Container */
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #121212; /* Dark background */
+    color: #e0e0e0; /* Light text */
+}
+.inventory-container {
+    text-align: center;
+    margin-top: 20px;
+    color: white;
+}
+
+/* Inventory Header */
+.inventory-title {
+    font-size: 2rem;
+    color: purple;
+    margin-bottom: 10px;
+}
+
+/* Section Headers */
+.section-header {
+    font-weight: bold;
+    color: white;
+    margin-bottom: 5px;
+}
+
+/* Available Items and Inventory Items Sections */
+.available-items,
+.inventory-items {
+    display: inline-flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+/* Styling for Item Actions (Add/Remove Buttons) */
+.item-action {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.item-action:hover {
+    color: lightgray;
+}
+
+/* Inventory Button Styling */
+.inventory-button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: white;
+    background-color: purple;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.inventory-button:hover {
+    background-color: #6a0dad; /* Darker purple */
+}

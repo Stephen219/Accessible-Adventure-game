@@ -1,13 +1,21 @@
-// testPage component from next docs
+'use client';
+import useAuth from '@/utils/useAuth';
 
-import Link from 'next/link'
-import React from 'react'
- 
-export default function Page() {
-  return (
-    <div>
-      <h1>Home</h1>
-      <Link href="/">About</Link>
-    </div>
-  )
-}
+import React from 'react';
+
+const Game = () => {
+    const { user } = useAuth();
+
+    return (
+        <div>
+            <h1>Welcome to the Game</h1>
+            {user ? (
+                <p>Logged in as: {user.email}</p>
+            ) : (
+                <p>Play as a guest or log in for progress tracking!</p>
+            )}
+        </div>
+    );
+};
+
+export default Game;
