@@ -6,6 +6,15 @@ import { speechToTextHandler } from '@/components/handlers/speech_TextHandler';
 import { textToSpeechHandler } from '@/components/handlers/text_SpeechHandler';
 import GameTranscript from '@/components/GameTranscript';
 import Inventory from '@/components/Inventory';
+
+
+
+
+
+import useAuth from '@/utils/useAuth';
+import { onAuthStateChanged } from 'firebase/auth';
+import { fetchGameStatistics, saveGameStatistics } from '@/utils/Statistics';
+
 // TODO : Add use of inventory
 // Todo add more scenes 
 // FIXME : add an introductory vice over
@@ -31,15 +40,103 @@ const Game = () => {
     const [transcript, setTranscript] = useState([]);
     const [announcement, setAnnouncement] = useState('');
     const [InventoryList, setInventoryList] = useState(['Knife', 'Stick']);
+    const { user, loading } = useAuth();
+    const startTimeRef = useRef(null);
+    
+    const [statistics, setStatistics] = useState({
 
-    // Ref to keep track of the current gameStarted state.
+        totalGamesPlayed: 0,
+        highscore: 0,
+        averageTimePerGame: 0,
+        totalTimePlayed: 0,
+        coins: 0,
+    });
+
+   
+
+
     const gameStartedRef = useRef(gameStarted);
-
-    // Update the ref whenever gameStarted state changes.
 
     useEffect(() => {
         gameStartedRef.current = gameStarted;
     }, [gameStarted]);
+
+
+
+
+
+    useEffect(() => {
+        if (user) {
+            const loadStatistics = async () => {
+                const stats = await fetchGameStatistics(user.uid);
+                if (stats) {
+                    setStatistics(stats);
+                }
+            };
+            loadStatistics();
+        } /// now here is for when the user is not logged in 
+        // Save statistics whenever they change for unlogged in user
+        
+    }, [user]);
+
+
+    // Save statistics whenever they change
+    useEffect(() => {
+        if (user) {
+            const saveStatistics = async () => {
+
+                await saveGameStatistics(user.uid, statistics);
+            };
+            saveStatistics();
+        }
+    }, [statistics, user]);
+
+    const startGame = () => {
+        setGameStarted(true);
+        startTimeRef.current = Date.now();
+        setStatistics((prev) => ({
+            ...prev,
+            totalGamesPlayed: prev.totalGamesPlayed + 1,
+            
+        }));
+    };
+
+    const endGame = () => {
+        setGameStarted(false);
+        if (startTimeRef.current) {
+            const gameTime = Math.floor((Date.now() - startTimeRef.current) / 1000);
+            setStatistics((prev) => ({
+                ...prev,
+                totalTimePlayed: prev.totalTimePlayed + gameTime,
+                highscore: Math.max(prev.highscore, prev.coins),
+                averageTimePerGame: prev.totalTimePlayed / prev.totalGamesPlayed, 
+            }));
+        }
+        startTimeRef.current = null;
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    /**
+     * add coins to the user's inventory
+     * @param {*} amount  - the amount of coins to add
+     */
+
+    const addCoins = (amount) => {
+        setStatistics((prev) => ({
+            ...prev,
+            coins: prev.coins + amount,
+        }));
+    }
+
+
+
+
+
+
+
 
     /**
      * Updates the transcript by adding a new entry.
@@ -85,7 +182,6 @@ const Game = () => {
 
 
     const handleSystemMessage = async (message) => {
-        // Ensure mic is off during system response
         await speechToTextHandler.handleStopListening({setIsListening});
 
         updateTranscript('System', message);
@@ -126,7 +222,8 @@ const Game = () => {
         updateTranscript('User', text);
 
         if (!gameStartedRef.current && trimmedText.includes('start game')) {
-            setGameStarted(true);
+            
+            startGame();
             handleSystemMessage('The game has started. ' + getSceneDescription(1));
         } else if (gameStartedRef.current) {
             if (trimmedText.includes('go faster')) {
@@ -136,17 +233,25 @@ const Game = () => {
                 decreaseSpeechRate();
                 handleSystemMessage('Speaking slower.');
 
-            } else if (trimmedText.includes('where am i now')) {
+            } else if (trimmedText.includes('stop game')) {
+                endGame();
+                setGameStarted(false);
+                handleSystemMessage('The game has ended. Thank you for playing!');
+            }
+
+            else if (trimmedText.includes('where am i now')) {
                 console.log('Current scene:', currentScene);
                 handleSystemMessage(getSceneDescription(currentScene));
             } else if (trimmedText.includes('knife') && currentScene === 1) {
+                addCoins(10);
 
-                setCurrentScene(2);  // Transition to scene 2
+                setCurrentScene(2);  
                 currentScene = 2;
                 console.log('Transitioning to scene 2');
                 playAudioAndTransition(2);
             } else if (trimmedText.includes('yes') && currentScene === 2) {
                 console.log('Transitioning to scene 3');
+                addCoins(10);
                 // if (isAudioPlaying) return; // Prevent duplicate audio playback
                 // setCurrentScene(3);
                 // handleSystemMessage(getSceneDescription(3));
@@ -266,7 +371,7 @@ const Game = () => {
 
             {/* Inventory Component */}
             <Inventory/>
-
+            
             {/* Component to display the game's transcript */}
             <GameTranscript transcript={transcript}/>
         </div>
