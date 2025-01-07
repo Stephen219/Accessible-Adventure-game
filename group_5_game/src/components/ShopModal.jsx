@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
 const ShopModal = ({ onClose }) => {
   return (
     <div
-      className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
       role="dialog"
       aria-modal="true"
     >
@@ -28,6 +28,12 @@ const ShopModal = ({ onClose }) => {
           <ul className="space-y-3">
             <li className="flex justify-between items-center">
               <span>Item 1 - 10 Coins</span>
+              <button className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">
+                Buy
+              </button>
+            </li>
+            <li className="flex justify-between items-center">
+              <span>Item 2 - 20 Coins</span>
               <button className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">
                 Buy
               </button>

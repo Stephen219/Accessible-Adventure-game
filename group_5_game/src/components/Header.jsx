@@ -6,11 +6,13 @@ import Button from './Button';
 import { Menu } from 'lucide-react';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
+import ShopModal from './ShopModal'; // Import the ShopModal component.
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const pathSegments = pathname.split('/').filter(Boolean);
+  const [isShopOpen, setIsShopOpen] = useState(false); // State for Shop Modal
 
   return (
     <header className="bg-[#0a0a0a] sticky top-0 z-40 w-full border-b border-[#1a1a1a]">
@@ -57,6 +59,16 @@ export default function Header() {
             </Link>
           </nav>
         </div>
+       
+        <div className="flex items-center gap-2">
+        {/* Shop Button */}
+        <Button
+          className="hidden md:inline-flex bg-[#9333EA] hover:bg-[#7928CA] text-white border-0"
+          onClick={() => setIsShopOpen(true)} // Open ShopModal
+        >
+          Shop
+        </Button>
+       
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
@@ -77,6 +89,7 @@ export default function Header() {
             <span className="sr-only">Toggle menu</span>
           </Button>
         </div>
+      </div>
       </div>
       {/* <div className="bg-[#1a1a1a] text-gray-400 px-4 py-2">
         You are here: <span className="text-[#9333EA]">{pathname}</span>
@@ -100,6 +113,12 @@ export default function Header() {
           );
         })}
       </div>
+
+      {/* Shop Modal */}
+    {isShopOpen && (
+      <ShopModal onClose={() => setIsShopOpen(false)} /> // Close ShopModal
+    )}
+
     </header>
   );
 }
