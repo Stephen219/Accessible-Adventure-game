@@ -1,5 +1,4 @@
 
-
 import React, { useState, useRef, useEffect } from 'react';
 import '@/components/css/Game.css';
 import SceneManager from './SceneManager.jsx';
@@ -7,7 +6,9 @@ import { speechToTextHandler } from '@/components/handlers/speech_TextHandler';
 import { textToSpeechHandler } from '@/components/handlers/text_SpeechHandler';
 import GameTranscript from '@/components/GameTranscript';
 import Inventory from '@/components/Inventory';
-
+// TODO : Add use of inventory
+// Todo add more scenes 
+// FIXME : add an introductory vice over
 
 /**
  * Game Component
@@ -135,12 +136,10 @@ const Game = () => {
                 decreaseSpeechRate();
                 handleSystemMessage('Speaking slower.');
 
-            } else if (trimmedText.includes('where')) {
+            } else if (trimmedText.includes('where am i now')) {
                 console.log('Current scene:', currentScene);
-
-                // Respond with the current scene description
                 handleSystemMessage(getSceneDescription(currentScene));
-            } else if (trimmedText.includes('go to') && currentScene === 1) {
+            } else if (trimmedText.includes('knife') && currentScene === 1) {
 
                 setCurrentScene(2);  // Transition to scene 2
                 currentScene = 2;
@@ -171,8 +170,8 @@ const Game = () => {
 
     const playAudioAndTransition = (sceneNumber) => {
         const audioMap = {
-            2: '/walking.mp3',
-            3: '/transition3.mp3', // Example for scene 3 audio
+            2: '/audios/running.mp3',
+            3: 'audios/running.mp3', 
         };
 
         const audioSrc = audioMap[sceneNumber];
@@ -226,11 +225,11 @@ const Game = () => {
     const getSceneDescription = (sceneNumber) => {
         switch (sceneNumber) {
             case 1:
-                return 'You are at a crossroads. The path to the left leads into a forest. The path to the right leads to a hill with a village. Where do you want to go?';
+                return 'A thick vine stretches across your path, tangled tightly between the trees, making it impossible to pass. In your inventory, you have a stick, a knife, a matchstick, and a rope. What should you use to clear the way?';
             case 2:
-                return 'Oh no, I’m at a wide, rushing river. The current is so strong! I have a rope, a stick, a knife, and a matchstick. What can I use to cross? Help me, please!';
+                return 'Oh no! You have  reached a wide, rushing river with a powerful current that looks impossible to swim across. In your inventory, you have a rope, a stick, a knife, and a matchstick. What can you use to safely get to the other side?';
             case 3:
-                return 'You are in a village with cobblestone streets and warm cottages. Villagers greet you kindly. What will you do next?';
+                return 'You are stuck at a crossroads, with four paths stretching in different directions, and you have no idea which way to go. Thankfully, you have a compass, a stick, a matchstick, and some rope. What should you use to find the right path?';
             default:
                 return 'Unknown scene.';
         }

@@ -28,38 +28,46 @@ const Inventory = () => {
     };
 
     return (
-        <div>
-            <h1>Inventory</h1>
+        <div className="inventory-container">
+            {/* Inventory Header */}
+            <h1 className="inventory-title">INVENTORY</h1>
 
-            <div>
-                <h2>Available Items</h2>
-                {availableItems.map((item) => (
-                    <button key={item} onClick={() => addItemToInventory(item)}>
-                        Add {item}
-                    </button>
-                ))}
+            {/* Available Items Section */}
+            <div className="available-items-section">
+                <p className="section-header">Available Items:</p>
+                <div className="available-items">
+                    {availableItems.map((item) => (
+                        <button
+                            key={item}
+                            className="item-action"
+                            onClick={() => addItemToInventory(item)}
+                        >
+                            Add {item}
+                        </button>
+                    ))}
+                </div>
             </div>
 
-            <div>
-                <h2>Your Inventory</h2>
-                {inventory.length > 0 ? (
-                    <ul>
-                        {inventory.map((item) => (
-                            <li key={item}>
-                                {item}
-                                <button onClick={() => removeItemFromInventory(item)}>
-                                    Remove
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>Your inventory is empty.</p>
-                )}
+            {/* Your Inventory Section */}
+            <div className="your-inventory-section">
+                <p className="section-header">Your Inventory:</p>
+                <div className="inventory-items">
+                    {inventory.map((item) => (
+                        <button
+                            key={item}
+                            className="item-action"
+                            onClick={() => removeItemFromInventory(item)}
+                        >
+                            {item}Remove
+                        </button>
+                    ))}
+                </div>
             </div>
 
-            {/* Button to trigger text-to-speech */}
-            <button onClick={speakInventory}>Tell me my inventory</button>
+            {/* Tell Me My Inventory Button */}
+            <button className="inventory-button" onClick={speakInventory}>
+                Tell me my inventory
+            </button>
         </div>
     );
 };

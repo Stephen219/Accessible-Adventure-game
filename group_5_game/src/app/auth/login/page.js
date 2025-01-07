@@ -7,7 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Twitter } from 'lucide-react';
+
 const Login = () => {
+   
     const emailRef = useRef();
     const passwordRef = useRef();
     const [errorMessage, setErrorMessage] = useState('');
@@ -68,7 +70,7 @@ const Login = () => {
               </div>
     
               <div className="grid grid-cols-3 gap-3">
-                <Button variant="outline">
+                <Button variant="outline" >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path
                       fill="currentColor"
