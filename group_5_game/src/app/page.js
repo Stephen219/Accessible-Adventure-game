@@ -1,11 +1,12 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { auth } from '../utils/firebaseConfig'; // Ensure the correct path
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { signUpWithEmail, loginWithEmail } from '../utils/authService'; 
+import { useAuthContext } from '../utils/AuthContext'; 
 
 export default function Home() {
   const router = useRouter();
+  const { user } = useAuthContext(); 
 
   // State Management
   const [isCreateAccountModalOpen, setCreateAccountModalOpen] = useState(false);
@@ -20,36 +21,36 @@ export default function Home() {
   const [cursorVisible, setCursorVisible] = useState(true); // For blinking cursor
   const fullText = 'Adventure Game'; // The full text to type out
 
-// Typing effect
-useEffect(() => {
-  let currentIndex = 0;
-  const typingInterval = setInterval(() => {
-    if (currentIndex < fullText.length) {
-      setDisplayedText(fullText.slice(0, currentIndex + 1)); // Dynamically slice the text
-      currentIndex++;
-    } else {
-      clearInterval(typingInterval);
-    }
-  }, 150); // Typing speed
+  // // Typing effect for dynamically displaying the "Adventure Game" title
+  useEffect(() => {
+    let currentIndex = 0;
+    const typingInterval = setInterval(() => {
+      if (currentIndex < fullText.length) {
+        setDisplayedText(fullText.slice(0, currentIndex + 1));
+        currentIndex++;
+      } else {
+        clearInterval(typingInterval);
+      }
+    }, 150);
 
-  return () => clearInterval(typingInterval);
-}, []); // fullText is static, so no need to add it as a dependency
+    return () => clearInterval(typingInterval);
+  }, []);
 
   // Blinking cursor effect
   useEffect(() => {
     const cursorInterval = setInterval(() => {
       setCursorVisible((prev) => !prev);
-    }, 500); // Blinking speed
+    }, 500);
 
     return () => clearInterval(cursorInterval);
   }, []);
 
   // Guest Login Handler
   const handleGuestLogin = () => {
-    router.push('/game');
+    router.push('/game'); // Redirect to the game page
   };
 
-  // Create Account Handler
+  // Create Account Handler using Firebase Authentication
   const handleCreateAccount = async (e) => {
     e.preventDefault();
     setError('');
@@ -60,11 +61,10 @@ useEffect(() => {
     }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      const user = await signUpWithEmail(email, password); 
       console.log('User created:', user);
 
-      // Optionally save additional user data to a database (if required)
+      // Optionally handle additional actions, like saving the username in Firestore
       alert('Account created successfully! Please log in.');
       setCreateAccountModalOpen(false); // Close the modal
     } catch (error) {
@@ -73,18 +73,17 @@ useEffect(() => {
     }
   };
 
-  // Login Handler
+  // Login Handler using Firebase Authentication
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      const user = await loginWithEmail(email, password); 
       console.log('Logged in user:', user);
 
       alert(`Welcome back, ${user.email}!`);
-      router.push('/game'); // Redirect to game page
+      router.push('/game'); // Redirect to the game page
     } catch (error) {
       console.error('Error logging in:', error.message);
       setError(error.message || 'Invalid email or password.');
@@ -203,37 +202,6 @@ const containerStyle = {
   marginTop: '50px',
 };
 
-const titleStyle = {
-  fontSize: '2rem',
-  color: '#fff',
-  fontWeight: 'bold',
-  display: 'inline-block',
-  marginBottom: '30px',
-};
-
-const cursorStyle = {
-  color: 'white',
-  animation: 'blink 1s steps(2, start) infinite',
-};
-
-// Add CSS keyframes for blinking cursor
-const blinkAnimation = `@keyframes blink {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}`;
-
-// Inject blinking cursor animation into a style tag
-if (typeof window !== 'undefined') {
-  const style = document.createElement('style');
-  style.type = 'text/css';
-  style.innerHTML = blinkAnimation;
-  document.head.appendChild(style);
-}
-
 const buttonContainerStyle = {
   display: 'flex',
   justifyContent: 'center',
@@ -254,8 +222,8 @@ const buttonStyle = {
 const linkStyle = {
   marginTop: '20px',
   fontSize: '16px',
-  color: '#FFFFFF', // Set text color to white
-  textDecoration: 'underline', // Keeps the underline for a hyperlink
+  color: '#FFFFFF',
+  textDecoration: 'underline',
   cursor: 'pointer',
 };
 
@@ -285,11 +253,6 @@ const inputStyle = {
   outline: 'none',
 };
 
-const inputFocusStyle = {
-  ...inputStyle,
-  border: '1px solid #4CAF50', // Highlights border in green when focused
-};
-
 const modalButtonStyle = {
   padding: '10px 20px',
   fontSize: '16px',
@@ -311,3 +274,4 @@ const closeButtonStyle = {
   cursor: 'pointer',
   marginTop: '10px',
 };
+
