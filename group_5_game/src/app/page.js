@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Home() {
@@ -13,6 +13,36 @@ export default function Home() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+
+  const [displayedText, setDisplayedText] = useState(''); // For typing effect
+const [cursorVisible, setCursorVisible] = useState(true); // For blinking cursor
+  const fullText = 'Adventure Game'; // The full text to type out
+
+// Typing effect
+useEffect(() => {
+  if (fullText) {
+    let currentIndex = 0;
+    const typingInterval = setInterval(() => {
+      if (currentIndex < fullText.length) {
+        setDisplayedText(fullText.slice(0, currentIndex + 1));
+        currentIndex++;
+      } else {
+        clearInterval(typingInterval);
+      }
+    }, 150); // Typing speed
+
+    return () => clearInterval(typingInterval);
+  }
+}, [fullText]); // Ensure fullText is a dependency
+
+// Blinking cursor effect
+useEffect(() => {
+  const cursorInterval = setInterval(() => {
+    setCursorVisible((prev) => !prev);
+  }, 500); // Blinking speed
+
+  return () => clearInterval(cursorInterval);
+}, []);
 
   // Guest Login Handler
   const handleGuestLogin = () => {
@@ -51,8 +81,11 @@ export default function Home() {
 
   return (
     <div style={containerStyle}>
-      {/* Title with Cursor Effect */}
-      <h1 style={titleStyle}>Adventure Game<span style={cursorStyle}>|</span></h1>
+    {/* Title with Typing Effect */}
+    <div style={{ fontFamily: 'monospace', fontSize: '24px', marginBottom: '20px' }}>
+      <span>{displayedText}</span>
+      {cursorVisible && <span style={{ display: 'inline-block', width: '10px' }}>|</span>}
+    </div>
 
       {/* Login Options */}
       <div style={buttonContainerStyle}>
