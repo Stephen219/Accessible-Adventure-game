@@ -1,4 +1,4 @@
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 
 /**
  * Fetch the coin balance for a specific user from Firestore
@@ -45,5 +45,24 @@ export async function initializeUserDocument(userId) {
     }
   } catch (error) {
     console.error("Error initializing user document:", error);
+  }
+}
+
+/**
+ * Update the coin balance for a specific user in Firestore.
+ * @param {string} userId - The unique ID of the logged-in user.
+ * @param {number} newCoinBalance - The updated coin balance.
+ * @returns {Promise<void>} - Resolves when the update is complete.
+ */
+export async function updateUserCoins(userId, newCoinBalance) {
+  try {
+    const db = getFirestore(); // Initialize Firestore
+    const userDocRef = doc(db, "users", userId); // Reference the user's document
+
+    await updateDoc(userDocRef, { coins: newCoinBalance }); // Update the coin balance
+    console.log(`Updated coins for user ${userId} to ${newCoinBalance}`);
+  } catch (error) {
+    console.error("Error updating user coins:", error);
+    throw error; // Rethrow the error to handle it in the calling function
   }
 }
