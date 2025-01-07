@@ -108,7 +108,7 @@ useEffect(() => {
       {/* Login Modal */}
       {isLoginModalOpen && (
         <div style={modalStyle}>
-          <h2>Login</h2>
+          <h2 style={{ color: '#000' }}>Login</h2> {/* Header color changed to black */}
           <form onSubmit={handleLogin}>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <input
@@ -140,7 +140,7 @@ useEffect(() => {
       {/* Create Account Modal */}
       {isCreateAccountModalOpen && (
         <div style={modalStyle}>
-          <h2>Create Account</h2>
+          <h2 style={{ color: '#000' }}>Create Account</h2> {/* Header color changed to black */}
           <form onSubmit={handleCreateAccount}>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <input
@@ -245,8 +245,8 @@ const buttonStyle = {
 const linkStyle = {
   marginTop: '20px',
   fontSize: '16px',
-  color: '#007BFF',
-  textDecoration: 'underline',
+  color: '#FFFFFF', // Set text color to white
+  textDecoration: 'underline', // Keeps the underline for a hyperlink
   cursor: 'pointer',
 };
 
@@ -262,6 +262,7 @@ const modalStyle = {
   textAlign: 'center',
   borderRadius: '8px',
 };
+
 const inputStyle = {
   display: 'block',
   width: '100%',
