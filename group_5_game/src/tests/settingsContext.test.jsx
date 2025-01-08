@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { SettingsProvider, useSettings } from './context/SettingsContext';
+import { SettingsProvider, useSettings } from '../context/SettingsContext';
 
 const TestComponent = () => {
     const { settings, setSpeechVolume, setSettings } = useSettings();
