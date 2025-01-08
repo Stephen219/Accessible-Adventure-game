@@ -9,7 +9,26 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import useAuth from '@/utils/useAuth'; // Assuming you have a `useAuth` hook
+import useAuth from '@/utils/useAuth'; 
+
+
+
+/**
+ * Header Component
+ * This component represents the navigation header for the application.
+ * It dynamically renders different navigation options based on the user's authentication status and the current screen size.
+ * 
+ * Props: None
+ * 
+ * Internal States:
+ * - `isOpen`: A boolean state that tracks whether the mobile navigation menu is open or not.
+ * 
+ * Key Features:
+ * - Displays the website logo and links to various pages like "Game", "Dashboard", "Profile", and "Settings".
+ * - Provides conditional rendering of authentication-related buttons (Login/Sign Up) based on whether the user is logged in.
+ * - Renders a mobile-friendly toggle menu for smaller screen sizes.
+ * - Displays the current page's breadcrumb navigation at the bottom of the header.
+ */
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
