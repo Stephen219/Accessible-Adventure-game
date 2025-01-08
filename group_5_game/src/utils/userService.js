@@ -68,7 +68,7 @@
 // }
 
 
-import { getFirestore, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 
 /**
  * Fetch the coin balance for a specific user from Firestore
@@ -77,19 +77,37 @@ import { getFirestore, doc, getDoc, setDoc, updateDoc } from "firebase/firestore
  */
 export async function getUserCoins(userId) {
   try {
-    const db = getFirestore(); // Initialize Firestore
-    const userDocRef = doc(db, "users", userId); // Reference the user's document
-    const userDoc = await getDoc(userDocRef); // Fetch the document
+    const db = getFirestore();
+    const userDocRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userDocRef);
 
     if (userDoc.exists()) {
-      return userDoc.data().coins || 0; // Return the coins or default to 0
+      return userDoc.data().coins || 0; // Return the coin balance or 0 if not set
     } else {
-      console.error("User document not found in Firestore.");
-      return 0;
+      console.error('User document not found in Firestore.');
+      return 0; // Default to 0 if user document doesn't exist
     }
   } catch (error) {
-    console.error("Error fetching user coins:", error);
+    console.error('Error fetching user coins:', error);
     return 0; // Return 0 in case of an error
+  }
+}
+
+/**
+ * Update the coin balance for a specific user in Firestore
+ * @param {string} userId - The unique ID of the logged-in user
+ * @param {number} newCoinBalance - The new coin balance to set
+ * @returns {Promise<void>}
+ */
+export async function updateUserCoins(userId, newCoinBalance) {
+  try {
+    const db = getFirestore();
+    const userDocRef = doc(db, 'users', userId);
+
+    await setDoc(userDocRef, { coins: newCoinBalance }, { merge: true }); // Update coin balance while keeping other data intact
+    console.log('User coins updated successfully.');
+  } catch (error) {
+    console.error('Error updating user coins:', error);
   }
 }
 
@@ -100,7 +118,7 @@ export async function getUserCoins(userId) {
 export async function initializeUserDocument(userId) {
   try {
     const db = getFirestore();
-    const userDocRef = doc(db, "users", userId);
+    const userDocRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userDocRef);
 
     if (!userDoc.exists()) {
@@ -109,47 +127,17 @@ export async function initializeUserDocument(userId) {
         coins: 0, // Default coin balance
         inventory: [], // Default empty inventory
       });
-      console.log("User document created successfully.");
+      console.log('User document created successfully.');
     } else {
-      console.log("User document already exists.");
-    }
-
-    // Initialize shop items in Firestore (if not already present)
-    const shopDocRef = doc(db, "shop", "default");
-    const shopDoc = await getDoc(shopDocRef);
-
-    if (!shopDoc.exists()) {
-      await setDoc(shopDocRef, {
-        items: [
-          { name: "Stick", price: 1 },
-          { name: "Rock", price: 3 },
-          { name: "Gun", price: 10 },
-        ],
-      });
-      console.log("Shop items initialized.");
-    } else {
-      console.log("Shop items already exist.");
+      console.log('User document already exists.');
     }
   } catch (error) {
-    console.error("Error initializing user or shop document:", error);
+    console.error('Error initializing user document:', error);
   }
 }
 
-/**
- * Update the coin balance for a specific user in Firestore.
- * @param {string} userId - The unique ID of the logged-in user.
- * @param {number} newCoinBalance - The updated coin balance.
- * @returns {Promise<void>} - Resolves when the update is complete.
- */
-export async function updateUserCoins(userId, newCoinBalance) {
-  try {
-    const db = getFirestore(); // Initialize Firestore
-    const userDocRef = doc(db, "users", userId); // Reference the user's document
 
-    await updateDoc(userDocRef, { coins: newCoinBalance }); // Update the coin balance
-    console.log(`Updated coins for user ${userId} to ${newCoinBalance}`);
-  } catch (error) {
-    console.error("Error updating user coins:", error);
-    throw error; // Rethrow the error to handle it in the calling function
-  }
-}
+
+
+
+

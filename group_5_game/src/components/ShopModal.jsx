@@ -8,6 +8,13 @@ export default function ShopModal({ onClose }) {
   const [coins, setCoins] = useState(0); // User's coin balance
   const { currentUser } = useAuth(); // Current logged-in user
 
+  // Hardcoded shop items
+  const shopItems = [
+    { id: 1, name: 'Stick', price: 1 },
+    { id: 2, name: 'Rock', price: 3 },
+    { id: 3, name: 'Gun', price: 10 },
+  ];
+
   useEffect(() => {
     async function fetchCoins() {
       if (currentUser?.uid) {
@@ -19,21 +26,21 @@ export default function ShopModal({ onClose }) {
   }, [currentUser]);
 
   // Handle purchasing an item
-  const handlePurchase = async (itemCost) => {
-    if (itemCost > coins) {
-      alert("Insufficient coins to purchase this item.");
+  const handlePurchase = async (item) => {
+    if (item.price > coins) {
+      alert('Insufficient coins to purchase this item.');
       return;
     }
 
-    const newCoinBalance = coins - itemCost;
+    const newCoinBalance = coins - item.price;
 
     try {
       await updateUserCoins(currentUser.uid, newCoinBalance); // Update in Firestore
       setCoins(newCoinBalance); // Update locally
-      alert("Purchase successful!");
+      alert(`You purchased ${item.name} successfully!`);
     } catch (error) {
-      console.error("Error completing purchase:", error);
-      alert("Failed to complete purchase. Please try again.");
+      console.error('Error completing purchase:', error);
+      alert('Failed to complete purchase. Please try again.');
     }
   };
 
@@ -50,19 +57,20 @@ export default function ShopModal({ onClose }) {
           <strong>Coins:</strong> {coins} {/* Display the user's coin balance */}
         </p>
         <div>
-          {/* Example items for purchase */}
-          <button
-            onClick={() => handlePurchase(50)} // Deduct 50 coins
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-          >
-            Buy Item 1 (50 Coins)
-          </button>
-          <button
-            onClick={() => handlePurchase(100)} // Deduct 100 coins
-            className="bg-blue-500 text-white px-4 py-2 rounded ml-2"
-          >
-            Buy Item 2 (100 Coins)
-          </button>
+          {/* Hardcoded shop items */}
+          {shopItems.map((item) => (
+            <div key={item.id} className="mb-4">
+              <p className="text-gray-700">
+                <strong>{item.name}</strong> - {item.price} Coins
+              </p>
+              <button
+                onClick={() => handlePurchase(item)}
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+              >
+                Buy {item.name}
+              </button>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -72,3 +80,6 @@ export default function ShopModal({ onClose }) {
 ShopModal.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
+
+
+

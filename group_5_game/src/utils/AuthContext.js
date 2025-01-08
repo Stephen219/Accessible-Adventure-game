@@ -17,32 +17,33 @@
 
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./firebaseConfig";
-import { initializeUserDocument } from "./userService";
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './firebaseConfig';
+import { initializeUserDocument } from './userService'; // Import only the required function
 
 // Create an AuthContext
 const AuthContext = createContext();
 
 // AuthProvider Component
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null); // Tracks the currently logged-in user
+  const [loading, setLoading] = useState(true); // Tracks if the auth process is still loading
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Ensure the user document exists in Firestore
+        // Initialize the user's Firestore document
         await initializeUserDocument(user.uid);
-        setCurrentUser(user);
+
+        setCurrentUser(user); // Set the user in state
       } else {
-        setCurrentUser(null);
+        setCurrentUser(null); // Clear the user if logged out
       }
-      setLoading(false);
+      setLoading(false); // Loading is complete
     });
 
-    return () => unsubscribe();
+    return () => unsubscribe(); // Cleanup subscription on unmount
   }, []);
 
   return (
@@ -56,12 +57,13 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
 
 // Alias for backward compatibility
 export const useAuthContext = useAuth; // Add this line for compatibility
+
 
 
