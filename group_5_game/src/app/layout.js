@@ -1,7 +1,6 @@
 import './globals.css';
 import { AuthProvider } from '@/utils/AuthContext';
 import Header from '@/components/Header';
-import { AuthProvider } from '@/utils/AuthContext'
 import { SettingsProvider } from "@/context/SettingsContext";
 
 export const metadata = {
