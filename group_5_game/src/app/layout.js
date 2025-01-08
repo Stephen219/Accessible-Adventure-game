@@ -1,6 +1,7 @@
 import './globals.css';
 import { AuthProvider } from '@/utils/AuthContext';
 import Header from '@/components/Header';
+import { SettingsProvider } from "@/context/SettingsContext";
 
 export const metadata = {
   title: 'Adventure Game',
@@ -25,10 +26,12 @@ export default function RootLayout({ children }) {
       </head>
       <body className="bg-[#0a0a0a] text-white min-h-screen flex flex-col">
         <AuthProvider>
+            <SettingsProvider>
           <Header />
           <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {children}
           </main>
+            </SettingsProvider>
         </AuthProvider>
       </body>
     </html>

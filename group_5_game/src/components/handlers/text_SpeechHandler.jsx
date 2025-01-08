@@ -64,7 +64,7 @@ class TextToSpeechHandler {
      * Speaks text with customizable speech options.
      *
      * @param {string} text - The text to be spoken
-     * @param {Object} options - Speech configuration options
+     * @param {{lang: *}} options - Speech configuration options
      * @param {number} [options.rate=1] - Speech rate (0.1 to 10)
      * @param {number} [options.pitch=1] - Speech pitch (0 to 2)
      * @param {number} [options.volume=1] - Speech volume (0 to 1)
