@@ -1,5 +1,11 @@
 import React from 'react';
 
+/**
+ * Scene3 Component
+ * This component represents the third scene of the game.
+ * It provides a scenario and asks the user to make a decision.
+ * */
+
 const Scene3 = () => {
     return (
         <div>

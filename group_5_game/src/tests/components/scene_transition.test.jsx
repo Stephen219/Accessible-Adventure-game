@@ -4,6 +4,10 @@ import '@testing-library/jest-dom';
 import Scene1 from '@/components/Scene1';
 import Scene2 from '@/components/Scene2';
 
+
+
+// Mock the Web Speech API
+
 jest.mock('@/components/handlers/speech_TextHandler', () => ({
   speechToTextHandler: {
     handleStartListening: jest.fn(),

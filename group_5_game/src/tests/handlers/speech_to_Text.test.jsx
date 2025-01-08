@@ -2,9 +2,19 @@ import '@testing-library/jest-dom';
 
 import { speechToTextHandler } from '@/components/handlers/speech_TextHandler';
 
+/**
+ * Mock the Web Speech API
+ * @class
+ * @param {string} text - The text to be spoken 
+ * @example
+ */
+
 describe('SpeechToTextHandler', () => {
+  // Mock recognition instance and event handlers
   let mockRecognition;
   let eventHandlers;
+
+  // Set up mock recognition instance and event handlers before each test
 
   beforeEach(() => {
     // Store event handlers
@@ -70,6 +80,8 @@ describe('SpeechToTextHandler', () => {
 
   });
 
+  // Test the onresult event handler
+
   describe('handleStopListening', () => {
     it('should stop listening and update state', async () => {
       const setIsListening = jest.fn();
@@ -84,9 +96,10 @@ describe('SpeechToTextHandler', () => {
     });
   });
 
-
-
-
+  /**
+   * Test the onerror event handler
+   * 
+   */
 
   describe('initialization', () => {
     it('should initialize with correct default values', () => {

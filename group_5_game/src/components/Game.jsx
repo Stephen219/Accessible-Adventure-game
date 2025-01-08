@@ -101,6 +101,14 @@ const Game = () => {
         }));
     };
 
+    /**
+     * Ends the game and updates the statistics.
+     * 
+     * This function calculates the total time played in seconds, updates the highscore if needed, and calculates the average time per game.
+     * 
+     * @returns {void}
+     */
+
     const endGame = () => {
         setGameStarted(false);
         if (startTimeRef.current) {
