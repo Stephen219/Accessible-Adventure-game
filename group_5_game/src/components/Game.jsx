@@ -1,4 +1,5 @@
 
+
 import React, { useState, useRef, useEffect } from 'react';
 import '@/components/css/Game.css';
 import SceneManager from './SceneManager.jsx';
@@ -7,17 +8,6 @@ import { textToSpeechHandler } from '@/components/handlers/text_SpeechHandler';
 import GameTranscript from '@/components/GameTranscript';
 import Inventory from '@/components/Inventory';
 
-
-
-
-
-import useAuth from '@/utils/useAuth';
-import { onAuthStateChanged } from 'firebase/auth';
-import { fetchGameStatistics, saveGameStatistics } from '@/utils/Statistics';
-
-// TODO : Add use of inventory
-// Todo add more scenes 
-// FIXME : add an introductory vice over
 
 /**
  * Game Component
@@ -40,111 +30,15 @@ const Game = () => {
     const [transcript, setTranscript] = useState([]);
     const [announcement, setAnnouncement] = useState('');
     const [InventoryList, setInventoryList] = useState(['Knife', 'Stick']);
-    const { user, loading } = useAuth();
-    const startTimeRef = useRef(null);
-    
-    const [statistics, setStatistics] = useState({
 
-        totalGamesPlayed: 0,
-        highscore: 0,
-        averageTimePerGame: 0,
-        totalTimePlayed: 0,
-        coins: 0,
-    });
-
-   
-
-
+    // Ref to keep track of the current gameStarted state.
     const gameStartedRef = useRef(gameStarted);
+
+    // Update the ref whenever gameStarted state changes.
 
     useEffect(() => {
         gameStartedRef.current = gameStarted;
     }, [gameStarted]);
-
-
-
-
-
-    useEffect(() => {
-        if (user) {
-            const loadStatistics = async () => {
-                const stats = await fetchGameStatistics(user.uid);
-                if (stats) {
-                    setStatistics(stats);
-                }
-            };
-            loadStatistics();
-        } /// now here is for when the user is not logged in 
-        // Save statistics whenever they change for unlogged in user
-        
-    }, [user]);
-
-
-    // Save statistics whenever they change
-    useEffect(() => {
-        if (user) {
-            const saveStatistics = async () => {
-
-                await saveGameStatistics(user.uid, statistics);
-            };
-            saveStatistics();
-        }
-    }, [statistics, user]);
-
-    const startGame = () => {
-        setGameStarted(true);
-        startTimeRef.current = Date.now();
-        setStatistics((prev) => ({
-            ...prev,
-            totalGamesPlayed: prev.totalGamesPlayed + 1,
-            
-        }));
-    };
-
-    /**
-     * Ends the game and updates the statistics.
-     * 
-     * This function calculates the total time played in seconds, updates the highscore if needed, and calculates the average time per game.
-     * 
-     * @returns {void}
-     */
-
-    const endGame = () => {
-        setGameStarted(false);
-        if (startTimeRef.current) {
-            const gameTime = Math.floor((Date.now() - startTimeRef.current) / 1000);
-            setStatistics((prev) => ({
-                ...prev,
-                totalTimePlayed: prev.totalTimePlayed + gameTime,
-                highscore: Math.max(prev.highscore, prev.coins),
-                averageTimePerGame: prev.totalTimePlayed / prev.totalGamesPlayed, 
-            }));
-        }
-        startTimeRef.current = null;
-    };
-
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    /**
-     * add coins to the user's inventory
-     * @param {*} amount  - the amount of coins to add
-     */
-
-    const addCoins = (amount) => {
-        setStatistics((prev) => ({
-            ...prev,
-            coins: prev.coins + amount,
-        }));
-    }
-
-
-
-
-
-
-
 
     /**
      * Updates the transcript by adding a new entry.
@@ -190,6 +84,7 @@ const Game = () => {
 
 
     const handleSystemMessage = async (message) => {
+        // Ensure mic is off during system response
         await speechToTextHandler.handleStopListening({setIsListening});
 
         updateTranscript('System', message);
@@ -230,8 +125,7 @@ const Game = () => {
         updateTranscript('User', text);
 
         if (!gameStartedRef.current && trimmedText.includes('start game')) {
-            
-            startGame();
+            setGameStarted(true);
             handleSystemMessage('The game has started. ' + getSceneDescription(1));
         } else if (gameStartedRef.current) {
             if (trimmedText.includes('go faster')) {
@@ -241,25 +135,21 @@ const Game = () => {
                 decreaseSpeechRate();
                 handleSystemMessage('Speaking slower.');
 
-            } else if (trimmedText.includes('stop game')) {
-                endGame();
-                setGameStarted(false);
-                handleSystemMessage('The game has ended. Thank you for playing!');
-            }
-
-            else if (trimmedText.includes('where am i now')) {
+            } else if (trimmedText.includes('where')) {
                 console.log('Current scene:', currentScene);
-                handleSystemMessage(getSceneDescription(currentScene));
-            } else if (trimmedText.includes('knife') && currentScene === 1) {
-                addCoins(10);
 
-                setCurrentScene(2);  
+                // Respond with the current scene description
+                handleSystemMessage(getSceneDescription(currentScene));
+            } else if (trimmedText.includes('go to') && currentScene === 1) {
+            } else if (trimmedText.includes('instructions')) {
+                speakInstructions();  // Trigger the instructions
+
+                setCurrentScene(2);  // Transition to scene 2
                 currentScene = 2;
                 console.log('Transitioning to scene 2');
                 playAudioAndTransition(2);
             } else if (trimmedText.includes('yes') && currentScene === 2) {
                 console.log('Transitioning to scene 3');
-                addCoins(10);
                 // if (isAudioPlaying) return; // Prevent duplicate audio playback
                 // setCurrentScene(3);
                 // handleSystemMessage(getSceneDescription(3));
@@ -283,8 +173,8 @@ const Game = () => {
 
     const playAudioAndTransition = (sceneNumber) => {
         const audioMap = {
-            2: '/audios/running.mp3',
-            3: 'audios/running.mp3', 
+            2: '/walking.mp3',
+            3: '/transition3.mp3', // Example for scene 3 audio
         };
 
         const audioSrc = audioMap[sceneNumber];
@@ -338,16 +228,44 @@ const Game = () => {
     const getSceneDescription = (sceneNumber) => {
         switch (sceneNumber) {
             case 1:
-                return 'A thick vine stretches across your path, tangled tightly between the trees, making it impossible to pass. In your inventory, you have a stick, a knife, a matchstick, and a rope. What should you use to clear the way?';
+                return 'You are at a crossroads. The path to the left leads into a forest. The path to the right leads to a hill with a village. Where do you want to go?';
             case 2:
-                return 'Oh no! You have  reached a wide, rushing river with a powerful current that looks impossible to swim across. In your inventory, you have a rope, a stick, a knife, and a matchstick. What can you use to safely get to the other side?';
+                return 'Oh no, I’m at a wide, rushing river. The current is so strong! I have a rope, a stick, a knife, and a matchstick. What can I use to cross? Help me, please!';
             case 3:
-                return 'You are stuck at a crossroads, with four paths stretching in different directions, and you have no idea which way to go. Thankfully, you have a compass, a stick, a matchstick, and some rope. What should you use to find the right path?';
+                return 'You are in a village with cobblestone streets and warm cottages. Villagers greet you kindly. What will you do next?';
             default:
                 return 'Unknown scene.';
         }
 
     };
+
+
+    /**
+     * Defines a list of voice commands that users can use to interact with the game.
+     *
+     * Each command has a specific action that the game can recognize. The commands range from controlling the game flow (e.g., "Start Game")
+     * to manipulating the text-to-speech settings (e.g., "Go Faster"). This array allows for easy management and expansion of voice commands.
+     */
+
+    const voiceCommands = [
+        { command: "Start Game", description: "Starts the game." },
+        { command: "Go Faster", description: "Makes the text-to-speech speech faster." },
+        { command: "Go Slower", description: "Makes the text-to-speech speech slower." },
+        { command: "Where", description: "Tells you where you currently are in the game." },
+        { command: "Go to", description: "Takes you to a specific scene in the game." },
+        { command: "Yes", description: "Confirms your action." },
+        { command: "No", description: "Cancels the current action." },
+    ];
+
+    const speakInstructions = () => {
+        const instructionsText = voiceCommands.map(
+            (command) => `${command.command}: ${command.description}`
+        ).join('. ');
+
+        handleSystemMessage(instructionsText);
+    };
+
+
 
     /**
      * Toggles speech recognition on or off based on the current listening state.
@@ -367,7 +285,7 @@ const Game = () => {
             ) : (
                 <p className="instruction">
                     Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>,
-                    or <strong>&quot;restart game&quot;</strong>.
+                    <strong>&quot;restart game&quot;</strong> or <strong>&quot;instructions&quot;</strong>.
                 </p>
             )}
 
@@ -379,7 +297,7 @@ const Game = () => {
 
             {/* Inventory Component */}
             <Inventory/>
-            
+
             {/* Component to display the game's transcript */}
             <GameTranscript transcript={transcript}/>
         </div>
