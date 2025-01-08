@@ -44,6 +44,19 @@ export default function ShopModal({ onClose }) {
     }
   };
 
+  // Handle adding 1 coin (for testing purposes)
+  const addCoin = async () => {
+    const newCoinBalance = coins + 1;
+    try {
+      await updateUserCoins(currentUser.uid, newCoinBalance); // Update in Firestore
+      setCoins(newCoinBalance); // Update locally
+      alert('1 coin added successfully!');
+    } catch (error) {
+      console.error('Error adding coin:', error);
+      alert('Failed to add coin. Please try again.');
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="bg-white rounded-lg p-6 max-w-sm w-full">
@@ -56,6 +69,17 @@ export default function ShopModal({ onClose }) {
         <p className="text-gray-700 mb-4">
           <strong>Coins:</strong> {coins} {/* Display the user's coin balance */}
         </p>
+
+        {/* Add Coin Button for Testing */}
+        <div className="mb-4">
+          <button
+            onClick={addCoin}
+            className="bg-green-500 text-white px-4 py-2 rounded"
+          >
+            Add 1 Coin (Testing)
+          </button>
+        </div>
+
         <div>
           {/* Hardcoded shop items */}
           {shopItems.map((item) => (
@@ -80,6 +104,7 @@ export default function ShopModal({ onClose }) {
 ShopModal.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
+
 
 
 

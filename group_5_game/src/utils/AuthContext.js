@@ -1,26 +1,9 @@
-
-// 'use client';
-
-// import React, { createContext, useContext } from 'react';
-// import useAuth from './useAuth';
-// import { useAuthContext } from '@/utils/AuthContext'; 
-
-// const AuthContext = createContext();
-
-// export const AuthProvider = ({ children }) => {
-//     const auth = useAuth();
-//     return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
-// };
-
-// export const useAuthContext = () => useContext(AuthContext);
-
-
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './firebaseConfig';
-import { initializeUserDocument } from './userService'; // Import only the required function
+import { auth } from './firebaseConfig'; // Firebase Auth initialization
+import { initializeUserDocument } from './userService'; // Import user initialization function
 
 // Create an AuthContext
 const AuthContext = createContext();
@@ -31,10 +14,16 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true); // Tracks if the auth process is still loading
 
   useEffect(() => {
+    // Subscribe to Firebase Auth state changes
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         // Initialize the user's Firestore document
-        await initializeUserDocument(user.uid);
+        try {
+          await initializeUserDocument(user.uid);
+          console.log('User document initialized for:', user.uid);
+        } catch (error) {
+          console.error('Error initializing user document:', error);
+        }
 
         setCurrentUser(user); // Set the user in state
       } else {
@@ -63,7 +52,7 @@ export const useAuth = () => {
 };
 
 // Alias for backward compatibility
-export const useAuthContext = useAuth; // Add this line for compatibility
+export const useAuthContext = useAuth;
 
 
 
