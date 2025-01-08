@@ -1,4 +1,4 @@
-import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, onSnapshot } from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from "firebase/firestore";
 
 /**
  * Initialize a user's Firestore document if it doesn't exist
@@ -86,6 +86,27 @@ export async function addItemToInventory(userId, item) {
 }
 
 /**
+ * Remove an item from the user's inventory
+ * @param {string} userId - The unique ID of the logged-in user
+ * @param {Object} item - The item to remove from the inventory
+ */
+export async function removeItemFromInventory(userId, item) {
+  try {
+    const db = getFirestore();
+    const userDocRef = doc(db, "users", userId);
+
+    // Remove item from inventory
+    await updateDoc(userDocRef, {
+      inventory: arrayRemove(item),
+    });
+
+    console.log(`${item.name} removed from inventory.`);
+  } catch (error) {
+    console.error("Error removing item from inventory:", error);
+  }
+}
+
+/**
  * Fetch the inventory for a specific user
  * @param {string} userId - The unique ID of the logged-in user
  * @returns {Promise<Array>} - The user's inventory
@@ -129,4 +150,3 @@ export function listenToInventory(userId, callback) {
     console.error("Error setting up real-time inventory listener:", error);
   }
 }
-

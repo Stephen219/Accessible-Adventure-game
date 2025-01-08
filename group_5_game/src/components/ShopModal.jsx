@@ -96,5 +96,3 @@ ShopModal.propTypes = {
 };
 
 
-
-
