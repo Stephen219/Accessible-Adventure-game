@@ -5,9 +5,11 @@ const Scene2 = () => {
         <div>
             <h2>Scene 2: Forest</h2>
             <p>
-            Oh no, I’m at a wide, rushing river. The current is so strong! I have a rope, a stick, a knife, and a matchstick. What can I use to cross? Help me, please!
+            Oh no! You have  reached a wide, rushing river with a powerful current that looks impossible to swim across. In your inventory, you have a rope, a stick, a knife, and a matchstick. What can you use to safely get to the other side?
             </p>
-            <p>What will you do next? Say go to Scene 1 to return to the crossroads or "go to Scene 3" to explore further.</p>
+            <p>
+                say what you want to use to get to the other side
+            </p>
         </div>
     );
 };

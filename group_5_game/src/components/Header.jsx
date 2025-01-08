@@ -1,105 +1,183 @@
-'use client';
-import React from 'react';
+"use client";
 
-import Link from 'next/link';
-import Button from './Button';
-import { Menu } from 'lucide-react';
-import { useState } from 'react';
-import { usePathname } from 'next/navigation';
+import React, { useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import ShopModal from "./ShopModal"; // Import the ShopModal component.
+import useAuth from "@/utils/useAuth"; // Assuming you have a `useAuth` hook
+import { getAuth, signOut } from "firebase/auth"; // For Firebase logout functionality
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
-  const pathname = usePathname();
-  const pathSegments = pathname.split('/').filter(Boolean);
+  const [isShopOpen, setIsShopOpen] = useState(false); // State for Shop Modal
+  const pathname = usePathname() || ""; // Fallback to an empty string if usePathname() fails
+  const pathSegments = pathname.split("/").filter(Boolean); // Ensure pathSegments is always an array
+  const router = useRouter();
+  const { user } = useAuth(); // Access user authentication state
+
+  const auth = getAuth();
+
+  // Logout function
+  const handleLogout = () => {
+    signOut(auth)
+        .then(() => {
+          console.log("User logged out");
+          router.push("/"); // Redirect to the landing page after logout
+        })
+        .catch((error) => {
+          console.error("Error logging out:", error);
+        });
+  };
+
+  const navItems = [
+    { name: "Game", href: "/game" },
+    { name: "Dashboard", href: "/dashboard" },
+    { name: "Profile", href: "/profile" },
+    { name: "Settings", href: "/settings" },
+  ];
 
   return (
-    <header className="bg-[#0a0a0a] sticky top-0 z-40 w-full border-b border-[#1a1a1a]">
-      <div className="container flex h-16 items-center justify-between mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-6 md:gap-8">
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="inline-block font-bold text-white text-xl">
-              Adventure
-            </span>
-          </Link>
-          <nav
-            className={`${
-              isOpen ? 'flex' : 'hidden'
-            } absolute top-16 text-lg left-0 right-0 flex-col gap-2 bg-[#0a0a0a] p-4 md:static md:flex md:flex-row md:gap-6 md:bg-transparent md:p-0`}
-            aria-hidden={!isOpen}
-          >
-            <Link
-              key="games"
-              href="#"
-              className="text-gray-300 hover:text-[#9333EA] transition-colors duration-200 text-xlg md:text-base"
-            >
-              <span className="text-lg">Games</span>
-            </Link>
-            <Link
-              key="dashboard"
-              href="#"
-              className="text-gray-300 hover:text-[#9333EA] transition-colors duration-200 text-sm md:text-base"
-            >
-              <span className="text-xl">Dashboard</span>
-            </Link>
-            <Link
-              key="profile"
-              href="#"
-              className="text-gray-300 hover:text-[#9333EA] transition-colors duration-200 text-sm md:text-base"
-            >
-              <span className="text-xl"> Profile</span>
-            </Link>
-            <Link
-              key="settings"
-              href="/settings"
-              className="text-gray-300 hover:text-[#9333EA] transition-colors duration-200 text-sm md:text-base"
-            >
-              <span className="text-xl">Settings</span>
-            </Link>
-          </nav>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            className="hidden md:inline-flex text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a]"
-          >
-            Sign in
-          </Button>
-          <Button className="hidden md:inline-flex bg-[#9333EA] hover:bg-[#7928CA] text-white border-0">
-            Start Game
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden text-gray-300"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">Toggle menu</span>
-          </Button>
-        </div>
-      </div>
-      {/* <div className="bg-[#1a1a1a] text-gray-400 px-4 py-2">
-        You are here: <span className="text-[#9333EA]">{pathname}</span>
-      </div> */}
-
-      {/* <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 py-2 bg-[#1a1a1a] text-gray-400 rounded-md">
-        You are here: <span className="text-[#9333EA]">{pathname}</span>
-      </div> */}
-
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 py-2 bg-[#1a1a1a] text-gray-400 rounded-md">
-        <span className="text-lg">You are here: </span>
-        {pathSegments.map((segment, index) => {
-          const linkPath = '/' + pathSegments.slice(0, index + 1).join('/');
-          return (
-            <React.Fragment key={index}>
-              <Link href={linkPath} className="text-[#9333EA] hover:underline">
-                {segment}
+      <header className="bg-[#0a0a0a] sticky top-0 z-40 w-full border-b border-[#1a1a1a]">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center">
+              <Link href="/" className="flex items-center space-x-2">
+              <span className="inline-block font-bold text-white text-xl">
+                Adventure
+              </span>
               </Link>
-              {index < pathSegments.length - 1 && ' / '}
-            </React.Fragment>
-          );
-        })}
-      </div>
-    </header>
+            </div>
+
+            <nav
+                className={`${
+                    isOpen ? "flex" : "hidden"
+                } absolute top-16 left-0 right-0 flex-col gap-2 bg-[#0a0a0a] p-4 md:static md:flex md:flex-row md:gap-6 md:bg-transparent md:p-0`}
+                aria-hidden={!isOpen}
+            >
+              {navItems.map((item) => (
+                  <Link
+                      key={item.name.toLowerCase()}
+                      href={item.href}
+                      className="text-gray-300 hover:text-[#9333EA] transition-colors duration-200 text-base"
+                  >
+                    {item.name}
+                  </Link>
+              ))}
+            </nav>
+
+            <div className="hidden md:flex items-center space-x-2">
+              {/* Show Log in and Sign up if the user is NOT logged in */}
+              {!user && (
+                  <>
+                    <Button
+                        variant="ghost"
+                        className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a]"
+                        onClick={() => router.push("/auth/login")}
+                    >
+                      Log in
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a]"
+                        onClick={() => router.push("/auth/register")}
+                    >
+                      Sign up
+                    </Button>
+                  </>
+              )}
+
+              {/* Show Shop, Start Game, and Logout buttons if the user IS logged in */}
+              {user && (
+                  <>
+                    <Button
+                        className="hidden md:inline-flex bg-[#9333EA] hover:bg-[#7928CA] text-white border-0"
+                        onClick={() => setIsShopOpen(true)} // Open ShopModal
+                    >
+                      Shop
+                    </Button>
+                    <Button
+                        className="bg-[#9333EA] hover:bg-[#7928CA] text-white border-0"
+                        onClick={() => router.push("/game")}
+                    >
+                      Start Game
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a]"
+                        onClick={handleLogout} // Logout button
+                    >
+                      Logout
+                    </Button>
+                  </>
+              )}
+            </div>
+
+            <div className="md:hidden">
+              <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-gray-300"
+                  onClick={() => setIsOpen(!isOpen)}
+              >
+                {isOpen ? (
+                    <X className="h-5 w-5" />
+                ) : (
+                    <Menu className="h-5 w-5" />
+                )}
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {isOpen && (
+            <div className="md:hidden">
+              <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                {navItems.map((item) => (
+                    <Link
+                        key={item.name.toLowerCase()}
+                        href={item.href}
+                        className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a] transition-colors duration-200"
+                        onClick={() => setIsOpen(false)}
+                    >
+                      {item.name}
+                    </Link>
+                ))}
+              </div>
+            </div>
+        )}
+
+        <div className="flex justify-center items-center py-2 bg-[#1a1a1a] text-gray-400">
+          <div className="text-sm">
+            You are here:{" "}
+            {pathSegments.length > 0 ? (
+                pathSegments.map((segment, index) => {
+                  const linkPath = "/" + pathSegments.slice(0, index + 1).join("/");
+                  return (
+                      <React.Fragment key={index}>
+                        <Link
+                            href={linkPath}
+                            className="text-[#9333EA] hover:underline"
+                        >
+                          {segment}
+                        </Link>
+                        {index < pathSegments.length - 1 && " / "}
+                      </React.Fragment>
+                  );
+                })
+            ) : (
+                <span className="text-[#9333EA]">Home</span>
+            )}
+          </div>
+        </div>
+
+        {/* Shop Modal */}
+        {isShopOpen && (
+            <ShopModal onClose={() => setIsShopOpen(false)} /> // Close ShopModal
+        )}
+      </header>
   );
 }
+

@@ -11,7 +11,7 @@ import { Twitter } from 'lucide-react';
 import { useGoogleSignIn } from '@/utils/authService';
 
 const SignUp = () => {
-    const { handleGoogleSignIn } = useGoogleSignIn();
+  const { handleGoogleSignIn } = useGoogleSignIn();
   const emailRef = useRef();
   const passwordRef = useRef();
   const confirmPasswordRef = useRef();
@@ -19,21 +19,15 @@ const SignUp = () => {
   const [passwordMatch, setPasswordMatch] = useState(true);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isPasswordValid, setIsPasswordValid] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState(' ');
 
   const handlePasswordChange = () => {
     const password = passwordRef.current.value;
     const confirmPassword = confirmPasswordRef.current.value;
-
-    // Check if passwords match
     const match = password === confirmPassword;
     setPasswordMatch(match);
-
-    // Check if password length is at least 6 characters
     const isValid = password.length >= 6;
     setIsPasswordValid(isValid);
-
-    // Disable button if passwords don't match or are invalid
     setIsButtonDisabled(!match || !isValid || !password || !confirmPassword);
   };
 
@@ -49,11 +43,14 @@ const SignUp = () => {
     } catch (error) {
       if (error.message === 'Firebase: Error (auth/email-already-in-use).') {
         setErrorMessage("Email already in use. Please sign in.");
-      } else {
-        setErrorMessage("An error occurred. Please try again.");
-      }
+      } else if (error.message === 'Firebase: Error (auth/weak-password).') {
+        setErrorMessage("Password is too weak. Please try again.");} 
+        else{
+        setErrorMessage("An error occurred. Please try again.");}
     }
   };
+
+  
 
   return (
     <div className="min-h-screen bg-[#121212] flex items-center justify-center p-4">
@@ -80,6 +77,7 @@ const SignUp = () => {
               <Input
                 type="password"
                 placeholder="Password"
+                data-testid="password"
                 ref={passwordRef}
                 onChange={handlePasswordChange}
                 className={`border ${passwordMatch ? 'border-gray-300' : 'border-red-500'}`}
@@ -89,6 +87,7 @@ const SignUp = () => {
               <Input
                 type="password"
                 placeholder="Confirm Password"
+                data-testid="confirm-password"
                 ref={confirmPasswordRef}
                 onChange={handlePasswordChange}
                 className={`border ${passwordMatch ? 'border-gray-300' : 'border-red-500'}`}
@@ -100,13 +99,12 @@ const SignUp = () => {
                     <p className="text-red-500 text-xs">Password must be at least 6 characters</p>
                 )}
             </div>
-            <Button className="w-full" disabled={isButtonDisabled}>
+            <Button className="w-full" disabled={isButtonDisabled} data-testid="sign-up-button">
               Sign Up
             </Button>
             
-            {/* Thick Line Below the Button */}
             <div
-              className={`h-2 mt-4 rounded-full transition-colors duration-300 ${
+              className={`h-2 mt-4 rounded-full transition-colors duration-300 bg-slate-300 ${
                 isPasswordValid && passwordMatch
                   ? 'bg-green-500'
                   : 'bg-red-700'
@@ -123,7 +121,8 @@ const SignUp = () => {
             </div>
 
             <div className="grid grid-cols-3 gap-2">
-              <Button variant="outline" size="sm" onClick={handleGoogleSignIn}>
+              <Button variant="outline" aria-label="Sign up with Google" data-testid="google-signin-button"
+               size="sm" onClick={handleGoogleSignIn}>
                 <svg className="w-4 h-4" viewBox="0 0 24 24">
                   <path
                     fill="currentColor"
