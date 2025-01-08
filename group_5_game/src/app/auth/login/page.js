@@ -7,12 +7,31 @@ import { Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Twitter } from 'lucide-react';
+/**
+ * Login Component
+ * This component handles the login form, where the user can sign in using email and password.
+ * It also provides options for social login (such as with Twitter) and a link to the sign-up page if the user doesn't have an account.
+ * 
+ * State:
+ * - `errorMessage`: Displays an error message if login fails.
+ * 
+ * Refs:
+ * - `emailRef`: Ref for the email input field.
+ * - `passwordRef`: Ref for the password input field.
+ */
 
 const Login = () => {
    
     const emailRef = useRef();
     const passwordRef = useRef();
     const [errorMessage, setErrorMessage] = useState('');
+
+
+      /**
+     * handleLogin function
+     * This function is called when the form is submitted. It attempts to log in the user using the provided email and password.
+     * If login is successful, the user is redirected to the '/game' page. If there is an error, an appropriate error message is shown.
+     */
     const handleLogin = async (e) => {
         e.preventDefault();
         const email = emailRef.current.value;

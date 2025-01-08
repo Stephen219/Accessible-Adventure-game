@@ -9,6 +9,11 @@ jest.mock("@/utils/authService", () => ({
   useGoogleSignIn: jest.fn(),
 }));
 
+/**
+ * Mock the authService module to mock the signUpWithEmail function
+ * and test the SignUp component.
+ */
+
 describe("SignUp Component", () => {
   beforeEach(() => {
     useGoogleSignIn.mockImplementation(() => ({
