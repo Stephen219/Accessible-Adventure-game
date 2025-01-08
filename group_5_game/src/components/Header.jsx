@@ -27,7 +27,7 @@ import useAuth from '@/utils/useAuth';
  */
 
 import ShopModal from "./ShopModal"; // Import the ShopModal component.
-import useAuth from "@/utils/useAuth"; // Assuming you have a `useAuth` hook
+
 import { getAuth, signOut } from "firebase/auth"; // For Firebase logout functionality
 
 
