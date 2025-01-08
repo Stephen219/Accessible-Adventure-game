@@ -33,6 +33,7 @@ const Game = () => {
     const [speechRate, setSpeechRate] = useState(1); // Default speech rate
 
     const [gameStarted, setGameStarted] = useState(false);
+    const [gamePaused, setGamePaused] = useState(false);
     let [currentScene, setCurrentScene] = useState(1);
     const [isListening, setIsListening] = useState(false);
     const [isSpeaking, setIsSpeaking] = useState(false);
@@ -224,6 +225,22 @@ const Game = () => {
      * @param {string} text - The recognized speech text.
      */
 
+
+    const pauseGame = () => {
+        if (gameStarted && !gamePaused) {
+            setGamePaused(true);
+            handleSystemMessage('The game has been paused.');
+        }
+    };
+
+    const resumeGame = () => {
+        if (gameStarted && gamePaused) {
+            setGamePaused(false);
+            handleSystemMessage('The game has been resumed.');
+        }
+    };
+
+
     const handleUserSpeech = (text) => {
         const trimmedText = text.trim().toLowerCase();
 
@@ -234,6 +251,11 @@ const Game = () => {
             startGame();
             handleSystemMessage('The game has started. ' + getSceneDescription(1));
         } else if (gameStartedRef.current) {
+            if (trimmedText.includes('pause game')) {
+                pauseGame();
+            } else if (trimmedText.includes('resume game')) {
+                resumeGame();
+            }
             if (trimmedText.includes('go faster')) {
                 increaseSpeechRate();
                 handleSystemMessage('Speaking faster.');
@@ -367,7 +389,7 @@ const Game = () => {
             ) : (
                 <p className="instruction">
                     Say <strong>&quot;start game&quot;</strong>, <strong>&quot;stop game&quot;</strong>,
-                    or <strong>&quot;restart game&quot;</strong>.
+                    <strong>&quot;pause game&quot;</strong>, or <strong>&quot;resume game&quot;</strong>.
                 </p>
             )}
 
