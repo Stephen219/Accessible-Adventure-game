@@ -50,6 +50,7 @@ export default function Header() {
             </Link>
           </div>
 
+          {/* Main navigation */}
           <nav
             className={`${
               isOpen ? "flex" : "hidden"
@@ -65,8 +66,54 @@ export default function Header() {
                 {item.name}
               </Link>
             ))}
+
+            {/* Add Shop, Start Game, and Logout buttons in the dropdown for mobile */}
+            {isOpen && user && (
+              <>
+                <Button
+                  className="bg-[#9333EA] hover:bg-[#7928CA] text-white border-0 w-full"
+                  onClick={() => setIsShopOpen(true)} // Open ShopModal
+                >
+                  Shop
+                </Button>
+                <Button
+                  className="bg-[#9333EA] hover:bg-[#7928CA] text-white border-0 w-full"
+                  onClick={() => router.push("/game")}
+                >
+                  Start Game
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a] w-full"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
+              </>
+            )}
+
+            {/* Show Log in and Sign up in the dropdown for mobile */}
+            {isOpen && !user && (
+              <>
+                <Button
+                  variant="ghost"
+                  className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a] w-full"
+                  onClick={() => router.push("/auth/login")}
+                >
+                  Log in
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a] w-full"
+                  onClick={() => router.push("/auth/register")}
+                >
+                  Sign up
+                </Button>
+              </>
+            )}
           </nav>
 
+          {/* Desktop buttons */}
           <div className="hidden md:flex items-center space-x-2">
             {/* Show Log in and Sign up if the user is NOT logged in */}
             {!user && (
@@ -114,6 +161,7 @@ export default function Header() {
             )}
           </div>
 
+          {/* Mobile menu toggle button */}
           <div className="md:hidden">
             <Button
               variant="ghost"
@@ -131,23 +179,6 @@ export default function Header() {
           </div>
         </div>
       </div>
-
-      {isOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {navItems.map((item) => (
-              <Link
-                key={item.name.toLowerCase()}
-                href={item.href}
-                className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a] transition-colors duration-200"
-                onClick={() => setIsOpen(false)}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
 
       <div className="flex justify-center items-center py-2 bg-[#1a1a1a] text-gray-400">
         <div className="text-sm">
@@ -180,4 +211,3 @@ export default function Header() {
     </header>
   );
 }
-
