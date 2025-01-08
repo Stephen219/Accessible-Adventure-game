@@ -10,6 +10,13 @@ import { Input } from '@/components/ui/input';
 import { Twitter } from 'lucide-react';
 import { useGoogleSignIn } from '@/utils/authService';
 
+
+/**
+ * SignUp Component
+ *  This component handles the sign-up form, where the user can create an account using email and password.
+ * It also provides options for social login (such as with Google) and a link to the sign-in page if the user already has an account.
+ * */
+
 const SignUp = () => {
   const { handleGoogleSignIn } = useGoogleSignIn();
   const emailRef = useRef();
@@ -20,6 +27,12 @@ const SignUp = () => {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [errorMessage, setErrorMessage] = useState(' ');
+
+
+  /**
+   * handlePasswordChange function
+   * This function is called when the password or confirm password fields are changed.
+   */
 
   const handlePasswordChange = () => {
     const password = passwordRef.current.value;
