@@ -4,6 +4,12 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Login from '@/app/auth/login/page';
 import { loginWithEmail } from '@/utils/authService';
 
+/**
+ * Mock the authService module to mock the loginWithEmail function 
+ * and test the Login component. 
+ * 
+ */
+
 
 import '@testing-library/jest-dom'; 
 

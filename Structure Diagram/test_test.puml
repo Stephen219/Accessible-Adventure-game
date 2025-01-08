@@ -1,0 +1,107 @@
+@startuml Architecture
+title Architecture Diagram for Adventure Game Application
+
+' Game Component Package
+package "Game Component" {
+    class Game {
+        + startGame()
+        + endGame()
+        + addCoins(amount: int)
+        + updateTranscript(type: string, text: string)
+        + handleUserSpeech(text: string)
+        + handleSystemMessage(message: string)
+    }
+    class SceneManager
+    class GameTranscript
+    class Inventory {
+        + items: InventoryItem[]  
+    }
+}
+
+' Handlers Package
+package "Handlers" {
+    class SpeechToTextHandler {
+        + handleStartListening(): void
+        + handleStopListening(): void
+    }
+    class TextToSpeechHandler {
+        + speak(message: string, options: SpeechOptions): void  
+    }
+}
+
+
+package "Utils" {
+    class UseAuth {
+        + user: User
+        + loading: boolean
+    }
+    class Statistics {
+        + fetchGameStatistics(userId: string): Promise<GameStats>  
+        + saveGameStatistics(userId: string, stats: GameStats): Promise<void>  
+    }
+}
+
+' Auth Routes Package
+package "Auth Routes" {
+    class Register {
+        + handleUserRegistration(data: RegistrationData): Promise<void>  
+    }
+    class Login {
+        + handleUserLogin(credentials: LoginCredentials): Promise<void>  
+    }
+}
+
+' Dashboard and Settings Package
+package "Dashboard and Settings" {
+    class DashboardComponent {
+        + fetchUserGameData(userId: string): Promise<GameData>  
+    }
+    class SettingsComponent {
+        + updateUserPreferences(userId: string, data: UserPreferences): Promise<void>  
+    }
+}
+
+' Relationships
+App --> Auth : Routes auth requests
+
+App --> DashboardComponent : Routes to main dashboard
+App --> Game : Routes to game interface
+Auth --> Login : Handles user login
+Auth --> Register : Handles new accounts
+App --> SettingsComponent : Routes to user settings
+Login --> Button : Uses UI components
+Register --> Button : Uses UI components
+DashboardComponent --> Statistics : Shows player progress
+
+SceneManager --> Scene1 : Manages game scene
+SceneManager --> Scene2 : Manages game scene
+SceneManager --> Scene3 : Manages game scene
+Game --> SceneManager : Controls active scene
+Game --> GameTranscript : Shows dialog history
+Game --> Inventory : Manages player items
+Game --> Statistics : Shows game stats
+
+namespace UI {
+    class Button
+    class Card
+    class Input
+}
+
+
+
+Game --> Card : Displays game content
+Login --> Input : Text entry
+Register --> Input : Text entry
+DashboardComponent --> Card : Shows user data
+Statistics --> Card : Shows data cards
+
+
+namespace Handlers {
+    class SpeechToTextHandler
+    class TextToSpeechHandler
+}
+
+Game --> SpeechToTextHandler : Speech recognition
+Game --> TextToSpeechHandler : Text-to-speech output
+
+@enduml

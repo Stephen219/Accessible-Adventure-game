@@ -1,6 +1,16 @@
 import React from "react"
 import { cn } from "@/utils/uiUtils"
 
+
+/**
+ * Card Component
+ * A wrapper component used to display content in a card-like structure with customizable styling.
+ * 
+ * Props:
+ * - `className`: Custom class names to override or extend default styles.
+ * - `...props`: Any additional props will be passed to the root element.
+ */
+
 const Card = React.forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}

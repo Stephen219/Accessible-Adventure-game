@@ -5,9 +5,9 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import ShopModal from "./ShopModal"; // Import the ShopModal component.
 import useAuth from "@/utils/useAuth"; // Assuming you have a `useAuth` hook
-import { getAuth, signOut } from "firebase/auth"; // For Firebase logout functionality
+import ShopModal from "./ShopModal"; // Import the ShopModal component
+import { getAuth, signOut } from "firebase/auth"; // Firebase logout functionality
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false); // Mobile menu state
@@ -16,15 +16,13 @@ export default function Header() {
   const pathSegments = pathname.split("/").filter(Boolean); // Ensure pathSegments is always an array
   const router = useRouter();
   const { user } = useAuth(); // Access user authentication state
-
   const auth = getAuth();
 
-  // Logout function
   const handleLogout = () => {
     signOut(auth)
       .then(() => {
         console.log("User logged out");
-        router.push("/"); // Redirect to the landing page after logout
+        router.push("/");
       })
       .catch((error) => {
         console.error("Error logging out:", error);
@@ -37,6 +35,51 @@ export default function Header() {
     { name: "Profile", href: "/profile" },
     { name: "Settings", href: "/settings" },
   ];
+
+  const renderAuthButtons = () => (
+    <>
+      {!user ? (
+        <>
+          <Button
+            variant="ghost"
+            className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a]"
+            onClick={() => router.push("/auth/login")}
+          >
+            Log in
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a]"
+            onClick={() => router.push("/auth/register")}
+          >
+            Sign up
+          </Button>
+        </>
+      ) : (
+        <>
+          <Button
+            className="bg-[#9333EA] hover:bg-[#7928CA] text-white border-0"
+            onClick={() => setIsShopOpen(true)} // Open ShopModal
+          >
+            Shop
+          </Button>
+          <Button
+            className="bg-[#9333EA] hover:bg-[#7928CA] text-white border-0"
+            onClick={() => router.push("/game")}
+          >
+            Start Game
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a]"
+            onClick={handleLogout} // Logout
+          >
+            Logout
+          </Button>
+        </>
+      )}
+    </>
+  );
 
   return (
     <header className="bg-[#0a0a0a] sticky top-0 z-40 w-full border-b border-[#1a1a1a]">
@@ -68,81 +111,15 @@ export default function Header() {
               </Link>
             ))}
 
-            {/* Add Shop and Start Game buttons for mobile dropdown */}
+            {/* Add Shop, Start Game, and Logout buttons for mobile dropdown */}
             {isOpen && (
-              <>
-                <Button
-                  className="bg-[#9333EA] hover:bg-[#7928CA] text-white border-0 w-full"
-                  onClick={() => setIsShopOpen(true)} // Open ShopModal
-                >
-                  Shop
-                </Button>
-                <Button
-                  className="bg-[#9333EA] hover:bg-[#7928CA] text-white border-0 w-full"
-                  onClick={() => router.push("/game")}
-                >
-                  Start Game
-                </Button>
-                {/* Conditional Logout for logged-in users */}
-                {user && (
-                  <Button
-                    variant="ghost"
-                    className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a] w-full"
-                    onClick={handleLogout}
-                  >
-                    Logout
-                  </Button>
-                )}
-              </>
+              <div className="mt-4 space-y-2">{renderAuthButtons()}</div>
             )}
           </nav>
 
           {/* Desktop buttons */}
           <div className="hidden md:flex items-center space-x-2">
-            {/* Show Shop and Start Game buttons for all users */}
-            <Button
-              className="hidden md:inline-flex bg-[#9333EA] hover:bg-[#7928CA] text-white border-0"
-              onClick={() => setIsShopOpen(true)} // Open ShopModal
-            >
-              Shop
-            </Button>
-            <Button
-              className="bg-[#9333EA] hover:bg-[#7928CA] text-white border-0"
-              onClick={() => router.push("/game")}
-            >
-              Start Game
-            </Button>
-
-            {/* Show Log in and Sign up if the user is NOT logged in */}
-            {!user && (
-              <>
-                <Button
-                  variant="ghost"
-                  className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a]"
-                  onClick={() => router.push("/auth/login")}
-                >
-                  Log in
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a]"
-                  onClick={() => router.push("/auth/register")}
-                >
-                  Sign up
-                </Button>
-              </>
-            )}
-
-            {/* Show Logout if the user IS logged in */}
-            {user && (
-              <Button
-                variant="ghost"
-                className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a]"
-                onClick={handleLogout}
-              >
-                Logout
-              </Button>
-            )}
+            {renderAuthButtons()}
           </div>
 
           {/* Mobile menu toggle button */}
@@ -164,6 +141,22 @@ export default function Header() {
         </div>
       </div>
 
+      {isOpen && (
+        <div className="md:hidden px-2 pt-2 pb-3 space-y-1">
+          {navItems.map((item) => (
+            <Link
+              key={item.name.toLowerCase()}
+              href={item.href}
+              className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a] transition-colors duration-200"
+              onClick={() => setIsOpen(false)}
+            >
+              {item.name}
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {/* Path Breadcrumb */}
       <div className="flex justify-center items-center py-2 bg-[#1a1a1a] text-gray-400">
         <div className="text-sm">
           You are here:{" "}
@@ -189,10 +182,7 @@ export default function Header() {
       </div>
 
       {/* Shop Modal */}
-      {isShopOpen && (
-        <ShopModal onClose={() => setIsShopOpen(false)} /> // Close ShopModal
-      )}
+      {isShopOpen && <ShopModal onClose={() => setIsShopOpen(false)} />}
     </header>
   );
 }
-

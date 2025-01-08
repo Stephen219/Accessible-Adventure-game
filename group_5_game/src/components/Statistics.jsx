@@ -2,6 +2,22 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Trophy, GamepadIcon, Clock, Coins, Timer, Hourglass } from 'lucide-react'
 
+
+/**
+ * StatisticsDashboard Component
+ * Displays various statistics related to a user's gameplay.
+ * Includes sections for overall stats, time analysis, and achievement progress.
+ *
+ * Props:
+ * highScore - The user's highest score.
+ * totalGamesPlayed - The total number of games played by the user.
+ * totalTimePlayed - The total amount of time the user has spent playing (in seconds).
+ * coins - The total number of coins earned by the user.
+ * averageTimePerGame - The average time spent per game (in seconds).
+ * shortestGame - The duration of the shortest game (in seconds).
+ * longestGame - The duration of the longest game (in seconds).
+ */
+
 const StatisticsDashboard = ({ 
   highScore = 0, 
   totalGamesPlayed = 0, 
