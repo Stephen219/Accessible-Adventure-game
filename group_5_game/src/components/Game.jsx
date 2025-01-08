@@ -141,7 +141,6 @@ const Game = () => {
                 // Respond with the current scene description
                 handleSystemMessage(getSceneDescription(currentScene));
             } else if (trimmedText.includes('go to') && currentScene === 1) {
-
             } else if (trimmedText.includes('instructions')) {
                 speakInstructions();  // Trigger the instructions
 
@@ -240,6 +239,7 @@ const Game = () => {
 
     };
 
+
     /**
      * Defines a list of voice commands that users can use to interact with the game.
      *
@@ -257,7 +257,6 @@ const Game = () => {
         { command: "No", description: "Cancels the current action." },
     ];
 
-
     const speakInstructions = () => {
         const instructionsText = voiceCommands.map(
             (command) => `${command.command}: ${command.description}`
@@ -265,6 +264,7 @@ const Game = () => {
 
         handleSystemMessage(instructionsText);
     };
+
 
 
     /**

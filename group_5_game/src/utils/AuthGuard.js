@@ -1,25 +1,31 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 import useAuth from '@/utils/useAuth';
-import React from 'react';
 
 const AuthGuard = ({ children }) => {
-    const { user, loading } = useAuth();
-    const router = useRouter();
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
-    if (loading) {
-        return <div>Loading...</div>; 
-    }
-
-    if (!user) {
+  useEffect(() => {
+    if (!loading) {
+      if (!user) {
+        alert('You need to login to access this page');
         
         router.push('/auth/login');
-        return null; 
+      } else {
+        setIsAuthorized(true); 
+      }
     }
+  }, [user, loading, router]);
 
-    // Allow rendering if the user is authenticated
-    return <>{children}</>;
+  if (loading || (!user && !isAuthorized)) {
+    return <div>Loading...</div>;
+  }
+
+  return <>{isAuthorized && children}</>;
 };
 
 export default AuthGuard;
