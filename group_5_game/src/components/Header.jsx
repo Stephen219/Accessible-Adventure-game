@@ -10,7 +10,7 @@ import useAuth from "@/utils/useAuth"; // Assuming you have a `useAuth` hook
 import { getAuth, signOut } from "firebase/auth"; // For Firebase logout functionality
 
 export default function Header() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // Mobile menu state
   const [isShopOpen, setIsShopOpen] = useState(false); // State for Shop Modal
   const pathname = usePathname() || ""; // Fallback to an empty string if usePathname() fails
   const pathSegments = pathname.split("/").filter(Boolean); // Ensure pathSegments is always an array
@@ -42,6 +42,7 @@ export default function Header() {
     <header className="bg-[#0a0a0a] sticky top-0 z-40 w-full border-b border-[#1a1a1a]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
+          {/* Logo Section */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <span className="inline-block font-bold text-white text-xl">
@@ -67,8 +68,8 @@ export default function Header() {
               </Link>
             ))}
 
-            {/* Add Shop, Start Game, and Logout buttons in the dropdown for mobile */}
-            {isOpen && user && (
+            {/* Add Shop and Start Game buttons for mobile dropdown */}
+            {isOpen && (
               <>
                 <Button
                   className="bg-[#9333EA] hover:bg-[#7928CA] text-white border-0 w-full"
@@ -82,39 +83,36 @@ export default function Header() {
                 >
                   Start Game
                 </Button>
-                <Button
-                  variant="ghost"
-                  className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a] w-full"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </Button>
-              </>
-            )}
-
-            {/* Show Log in and Sign up in the dropdown for mobile */}
-            {isOpen && !user && (
-              <>
-                <Button
-                  variant="ghost"
-                  className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a] w-full"
-                  onClick={() => router.push("/auth/login")}
-                >
-                  Log in
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a] w-full"
-                  onClick={() => router.push("/auth/register")}
-                >
-                  Sign up
-                </Button>
+                {/* Conditional Logout for logged-in users */}
+                {user && (
+                  <Button
+                    variant="ghost"
+                    className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a] w-full"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </Button>
+                )}
               </>
             )}
           </nav>
 
           {/* Desktop buttons */}
           <div className="hidden md:flex items-center space-x-2">
+            {/* Show Shop and Start Game buttons for all users */}
+            <Button
+              className="hidden md:inline-flex bg-[#9333EA] hover:bg-[#7928CA] text-white border-0"
+              onClick={() => setIsShopOpen(true)} // Open ShopModal
+            >
+              Shop
+            </Button>
+            <Button
+              className="bg-[#9333EA] hover:bg-[#7928CA] text-white border-0"
+              onClick={() => router.push("/game")}
+            >
+              Start Game
+            </Button>
+
             {/* Show Log in and Sign up if the user is NOT logged in */}
             {!user && (
               <>
@@ -135,29 +133,15 @@ export default function Header() {
               </>
             )}
 
-            {/* Show Shop, Start Game, and Logout buttons if the user IS logged in */}
+            {/* Show Logout if the user IS logged in */}
             {user && (
-              <>
-                <Button
-                  className="hidden md:inline-flex bg-[#9333EA] hover:bg-[#7928CA] text-white border-0"
-                  onClick={() => setIsShopOpen(true)} // Open ShopModal
-                >
-                  Shop
-                </Button>
-                <Button
-                  className="bg-[#9333EA] hover:bg-[#7928CA] text-white border-0"
-                  onClick={() => router.push("/game")}
-                >
-                  Start Game
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a]"
-                  onClick={handleLogout} // Logout button
-                >
-                  Logout
-                </Button>
-              </>
+              <Button
+                variant="ghost"
+                className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a]"
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
             )}
           </div>
 
@@ -211,3 +195,4 @@ export default function Header() {
     </header>
   );
 }
+
