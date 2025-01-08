@@ -240,6 +240,13 @@ const Game = () => {
 
     };
 
+    /**
+     * Defines a list of voice commands that users can use to interact with the game.
+     *
+     * Each command has a specific action that the game can recognize. The commands range from controlling the game flow (e.g., "Start Game")
+     * to manipulating the text-to-speech settings (e.g., "Go Faster"). This array allows for easy management and expansion of voice commands.
+     */
+
     const voiceCommands = [
         { command: "Start Game", description: "Starts the game." },
         { command: "Go Faster", description: "Makes the text-to-speech speech faster." },
