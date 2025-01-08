@@ -42,7 +42,7 @@ export function SettingsProvider({ children }) {
     );
 }
 
-// Custom export to access thr settings context
+// Custom export to access the settings context
 export function useSettings() {
     return useContext(SettingsContext);
 }
