@@ -1,13 +1,9 @@
-
-
-
-
 "use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X } from 'lucide-react';
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import useAuth from '@/utils/useAuth'; 
 
@@ -30,12 +26,32 @@ import useAuth from '@/utils/useAuth';
  * - Displays the current page's breadcrumb navigation at the bottom of the header.
  */
 
+import ShopModal from "./ShopModal"; // Import the ShopModal component.
+import useAuth from "@/utils/useAuth"; // Assuming you have a `useAuth` hook
+import { getAuth, signOut } from "firebase/auth"; // For Firebase logout functionality
+
+
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
-  const pathname = usePathname();
+  const [isShopOpen, setIsShopOpen] = useState(false); // State for Shop Modal
+  const pathname = usePathname() || ""; // Fallback to an empty string if usePathname() fails
+  const pathSegments = pathname.split("/").filter(Boolean); // Ensure pathSegments is always an array
   const router = useRouter();
   const { user } = useAuth(); // Access user authentication state
-  const pathSegments = pathname.split("/").filter(Boolean);
+
+  const auth = getAuth();
+
+  // Logout function
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => {
+        console.log("User logged out");
+        router.push("/"); // Redirect to the landing page after logout
+      })
+      .catch((error) => {
+        console.error("Error logging out:", error);
+      });
+  };
 
   const navItems = [
     { name: "Game", href: "/game" },
@@ -74,31 +90,50 @@ export default function Header() {
           </nav>
 
           <div className="hidden md:flex items-center space-x-2">
-            {/* Hide Log in and Sign up if user is authenticated */}
+            {/* Show Log in and Sign up if the user is NOT logged in */}
             {!user && (
               <>
                 <Button
                   variant="ghost"
                   className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a]"
-                  onClick={() => router.push('/auth/login')}
+                  onClick={() => router.push("/auth/login")}
                 >
                   Log in
                 </Button>
                 <Button
                   variant="ghost"
                   className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a]"
-                  onClick={() => router.push('/auth/register')}
+                  onClick={() => router.push("/auth/register")}
                 >
                   Sign up
                 </Button>
               </>
             )}
-            <Button
-              className="bg-[#9333EA] hover:bg-[#7928CA] text-white border-0"
-              onClick={() => router.push('/game')}
-            >
-              Start Game
-            </Button>
+
+            {/* Show Shop, Start Game, and Logout buttons if the user IS logged in */}
+            {user && (
+              <>
+                <Button
+                  className="hidden md:inline-flex bg-[#9333EA] hover:bg-[#7928CA] text-white border-0"
+                  onClick={() => setIsShopOpen(true)} // Open ShopModal
+                >
+                  Shop
+                </Button>
+                <Button
+                  className="bg-[#9333EA] hover:bg-[#7928CA] text-white border-0"
+                  onClick={() => router.push("/game")}
+                >
+                  Start Game
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a]"
+                  onClick={handleLogout} // Logout button
+                >
+                  Logout
+                </Button>
+              </>
+            )}
           </div>
 
           <div className="md:hidden">
@@ -133,45 +168,6 @@ export default function Header() {
               </Link>
             ))}
           </div>
-          <div className="pt-4 pb-3 border-t border-[#1a1a1a]">
-            <div className="flex items-center px-5">
-              {!user && (
-                <Button
-                  variant="ghost"
-                  className="w-full text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a] justify-start"
-                  onClick={() => {
-                    router.push('/auth/login');
-                    setIsOpen(false);
-                  }}
-                >
-                  Log in
-                </Button>
-              )}
-            </div>
-            <div className="mt-3 px-2 space-y-1">
-              {!user && (
-                <Button
-                  variant="ghost"
-                  className="w-full text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a] justify-start"
-                  onClick={() => {
-                    router.push('/auth/register');
-                    setIsOpen(false);
-                  }}
-                >
-                  Sign up
-                </Button>
-              )}
-              <Button
-                className="w-full bg-[#9333EA] hover:bg-[#7928CA] text-white border-0"
-                onClick={() => {
-                  router.push('/game');
-                  setIsOpen(false);
-                }}
-              >
-                Start Game
-              </Button>
-            </div>
-          </div>
         </div>
       )}
 
@@ -198,6 +194,11 @@ export default function Header() {
           )}
         </div>
       </div>
+
+      {/* Shop Modal */}
+      {isShopOpen && (
+        <ShopModal onClose={() => setIsShopOpen(false)} /> // Close ShopModal
+      )}
     </header>
   );
 }
