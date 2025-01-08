@@ -6,13 +6,15 @@ import VoiceSelector from '@/components/VoiceSelector';
 import i18n from "@/components/i18n";
 import { getAuth } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from "../utils/firestore";
+import { db } from "@/utils/firestore";
 
 export default function Page() {
+    // Creating local state for volume, voice and language
     const { settings, setSpeechVolume, setSettings } = useSettings();
     const [selectedVoice, setSelectedVoice] = useState(null);
     const [language, setLanguage] = useState('en');
 
+    // Function to save a users preferences
     const saveUserPreferences = async (settings) => {
         const auth = getAuth();
         const user = auth.currentUser;
@@ -30,7 +32,7 @@ export default function Page() {
         }
     };
 
-    // Load user preferences from Firestore
+    // Function to load user preferences from firestore
     const loadUserPreferences = async () => {
         const auth = getAuth();
         const user = auth.currentUser;
@@ -56,6 +58,7 @@ export default function Page() {
         }
     };
 
+    // useEffect to load a users settings
     useEffect(() => {
         const fetchSettings = async () => {
             const userSettings = await loadUserPreferences();
@@ -64,6 +67,7 @@ export default function Page() {
         fetchSettings();
     }, [setSettings]);
 
+    // Handle speech volume changes and update it in firestore
     const handleSpeechVolumeChange = (value) => {
         setSpeechVolume(value);
         textToSpeechHandler.speak("Volume set to " + value + " percent", {
@@ -73,60 +77,68 @@ export default function Page() {
         handleSettingsChange({ ...settings, volume: value });
     };
 
+    // Handle voice changes and update it in firestore
     const handleVoiceChange = (voice) => {
         setSelectedVoice(voice);
         textToSpeechHandler.speak("Voice changed to " + voice.name, { voice });
         handleSettingsChange({ ...settings, voice: voice.name });
     };
 
+    // Handle language changes and update i18n and firestore
     const handleLanguageChange = (event) => {
         const selectedLanguage = event.target.value;
         setLanguage(selectedLanguage);
         i18n.changeLanguage(selectedLanguage);
-        textToSpeechHandler.speak(`Language changed to ${selectedLanguage}`, { lang: selectedLanguage });
+        textToSpeechHandler.speak(`Language changed to ${selectedLanguage}`, {
+            lang: selectedLanguage,
+            voice: selectedVoice });
         handleSettingsChange({ ...settings, language: selectedLanguage });
     };
 
+    // Function to update settings in context and firestore
     const handleSettingsChange = (newSettings) => {
         setSettings(newSettings);
         saveUserPreferences(newSettings);
     };
 
+    // UI elements that will be displayed on the settings page
     return (
-        <div>
-            <h1>Settings</h1>
+        <div className="container mx-auto p-4">
+            <h1 className="text-2xl font-bold mb-6">Settings</h1>
 
             {/* Text-to-Speech Volume Slider */}
-            <div>
-                <label htmlFor="speechVolume">Text-to-Speech Volume</label>
+            <div className="mb-4">
+                <label htmlFor="speechVolume" className="block text-lg font-medium text-white mb-2">Text-to-Speech Volume</label>
                 <input
                     type="range"
                     id="speechVolume"
                     min="0"
                     max="100"
-                    value={settings.volume * 100} // Convert back to percentage
+                    value={settings.volume * 100 || 0} // Default value in case volume is not set
                     onChange={(e) => handleSpeechVolumeChange(Number(e.target.value))}
+                    className="w-60 h-2 bg-purple-500 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-purple-600"
                 />
-                <span>{Math.round(settings.volume * 100)}%</span>
+                <span className="text-lg ml-3">{Math.round(settings.volume * 100) || 0}%</span> {/* Ensure default value */}
             </div>
 
             {/* Voice Selector Component */}
-            <div>
-                <label htmlFor="voices">Select Voice:</label>
+            <div className="mb-4">
+                <label htmlFor="voices" className="block text-lg font-medium text-white mb-2">Select Voice:</label>
                 <VoiceSelector onVoiceChange={handleVoiceChange} />
             </div>
 
             {/* Language Selector */}
-            <div>
-                <label htmlFor="language">Text-to-speech Language</label>
+            <div className="mb-4">
+                <label htmlFor="language" className="block text-lg font-medium text-white mb-2">Text-to-speech Language</label>
                 <select
                     id="language"
-                    value={language}
+                    value={settings.language || "en"} // Default language
                     onChange={handleLanguageChange}
+                    className="w-60 p-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-600"
                 >
-                    <option value="en">English</option>
-                    <option value="es">Spanish</option>
-                    <option value="fr">French</option>
+                    <option value="english">English</option>
+                    <option value="spanish">Spanish</option>
+                    <option value="french">French</option>
                 </select>
             </div>
         </div>
