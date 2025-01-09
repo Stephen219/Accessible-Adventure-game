@@ -1,27 +1,21 @@
-
-
-
-
-
-
 "use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X } from 'lucide-react';
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import useAuth from '@/utils/useAuth';
-import ShopModal from "./ShopModal";
-import { getAuth, signOut } from "firebase/auth";
+import useAuth from "@/utils/useAuth"; // Assuming you have a `useAuth` hook
+import ShopModal from "./ShopModal"; // Import the ShopModal component
+import { getAuth, signOut } from "firebase/auth"; // Firebase logout functionality
 
 export default function Header() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isShopOpen, setIsShopOpen] = useState(false);
-  const pathname = usePathname() || "";
-  const pathSegments = pathname.split("/").filter(Boolean);
+  const [isOpen, setIsOpen] = useState(false); // Mobile menu state
+  const [isShopOpen, setIsShopOpen] = useState(false); // State for Shop Modal
+  const pathname = usePathname() || ""; // Fallback to an empty string if usePathname() fails
+  const pathSegments = pathname.split("/").filter(Boolean); // Ensure pathSegments is always an array
   const router = useRouter();
-  const { user } = useAuth();
+  const { user } = useAuth(); // Access user authentication state
   const auth = getAuth();
 
   const handleLogout = () => {
@@ -65,7 +59,7 @@ export default function Header() {
         <>
           <Button
             className="bg-[#9333EA] hover:bg-[#7928CA] text-white border-0"
-            onClick={() => setIsShopOpen(true)}
+            onClick={() => setIsShopOpen(true)} // Open ShopModal
           >
             Shop
           </Button>
@@ -78,7 +72,7 @@ export default function Header() {
           <Button
             variant="ghost"
             className="text-gray-300 hover:text-[#9333EA] hover:bg-[#1a1a1a]"
-            onClick={handleLogout}
+            onClick={handleLogout} // Logout
           >
             Logout
           </Button>
@@ -91,6 +85,7 @@ export default function Header() {
     <header className="bg-[#0a0a0a] sticky top-0 z-40 w-full border-b border-[#1a1a1a]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
+          {/* Logo Section */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <span className="inline-block font-bold text-white text-xl">
@@ -99,7 +94,13 @@ export default function Header() {
             </Link>
           </div>
 
-          <nav className="hidden md:flex items-center space-x-4">
+          {/* Main navigation */}
+          <nav
+            className={`${
+              isOpen ? "flex" : "hidden"
+            } absolute top-16 left-0 right-0 flex-col gap-2 bg-[#0a0a0a] p-4 md:static md:flex md:flex-row md:gap-6 md:bg-transparent md:p-0`}
+            aria-hidden={!isOpen}
+          >
             {navItems.map((item) => (
               <Link
                 key={item.name.toLowerCase()}
@@ -109,12 +110,19 @@ export default function Header() {
                 {item.name}
               </Link>
             ))}
+
+            {/* Add Shop, Start Game, and Logout buttons for mobile dropdown */}
+            {isOpen && (
+              <div className="mt-4 space-y-2">{renderAuthButtons()}</div>
+            )}
           </nav>
 
+          {/* Desktop buttons */}
           <div className="hidden md:flex items-center space-x-2">
             {renderAuthButtons()}
           </div>
 
+          {/* Mobile menu toggle button */}
           <div className="md:hidden">
             <Button
               variant="ghost"
@@ -145,12 +153,10 @@ export default function Header() {
               {item.name}
             </Link>
           ))}
-          <div className="mt-4 space-y-2">
-            {renderAuthButtons()}
-          </div>
         </div>
       )}
 
+      {/* Path Breadcrumb */}
       <div className="flex justify-center items-center py-2 bg-[#1a1a1a] text-gray-400">
         <div className="text-sm">
           You are here:{" "}
@@ -175,10 +181,8 @@ export default function Header() {
         </div>
       </div>
 
-      {isShopOpen && (
-        <ShopModal onClose={() => setIsShopOpen(false)} />
-      )}
+      {/* Shop Modal */}
+      {isShopOpen && <ShopModal onClose={() => setIsShopOpen(false)} />}
     </header>
   );
 }
-

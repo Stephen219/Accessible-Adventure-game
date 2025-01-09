@@ -1,4 +1,4 @@
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs, updateDoc, onSnapshot } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from "firebase/firestore";
 
 /**
  * Initialize a user's Firestore document if it doesn't exist
@@ -7,21 +7,21 @@ import { getFirestore, doc, getDoc, setDoc, collection, getDocs, updateDoc, onSn
 export async function initializeUserDocument(userId) {
   try {
     const db = getFirestore();
-    const userDocRef = doc(db, 'users', userId);
+    const userDocRef = doc(db, "users", userId);
     const userDoc = await getDoc(userDocRef);
 
     if (!userDoc.exists()) {
       // Create a new document with default values
       await setDoc(userDocRef, {
-        coins: 0, // Default coin balance
+        coins: 10, // Default coin balance
         inventory: [], // Default empty inventory
       });
-      console.log('User document created successfully.');
+      console.log("User document created successfully.");
     } else {
-      console.log('User document already exists.');
+      console.log("User document already exists.");
     }
   } catch (error) {
-    console.error('Error initializing user document:', error);
+    console.error("Error initializing user document:", error);
   }
 }
 
@@ -33,17 +33,17 @@ export async function initializeUserDocument(userId) {
 export async function getUserCoins(userId) {
   try {
     const db = getFirestore();
-    const userDocRef = doc(db, 'users', userId);
+    const userDocRef = doc(db, "users", userId);
     const userDoc = await getDoc(userDocRef);
 
     if (userDoc.exists()) {
       return userDoc.data().coins || 0;
     } else {
-      console.error('User document not found in Firestore.');
+      console.error("User document not found in Firestore.");
       return 0;
     }
   } catch (error) {
-    console.error('Error fetching user coins:', error);
+    console.error("Error fetching user coins:", error);
     return 0;
   }
 }
@@ -56,40 +56,97 @@ export async function getUserCoins(userId) {
 export async function updateUserCoins(userId, newCoinBalance) {
   try {
     const db = getFirestore();
-    const userDocRef = doc(db, 'users', userId);
+    const userDocRef = doc(db, "users", userId);
     await updateDoc(userDocRef, { coins: newCoinBalance });
-    console.log('User coins updated successfully.');
+    console.log("User coins updated successfully.");
   } catch (error) {
-    console.error('Error updating user coins:', error);
+    console.error("Error updating user coins:", error);
   }
 }
 
 /**
- * Listen to real-time coin balance updates for a specific user
+ * Add an item to the user's inventory
  * @param {string} userId - The unique ID of the logged-in user
- * @param {function} callback - A function to handle real-time coin updates
+ * @param {Object} item - The item to add to the inventory
  */
-export function listenToUserCoins(userId, callback) {
+export async function addItemToInventory(userId, item) {
   try {
     const db = getFirestore();
-    const userDocRef = doc(db, 'users', userId);
-    return onSnapshot(userDocRef, (doc) => {
-      if (doc.exists()) {
-        callback(doc.data().coins || 0);
-      } else {
-        console.error('User document not found in Firestore for real-time updates.');
-        callback(0);
-      }
+    const userDocRef = doc(db, "users", userId);
+
+    // Add item to inventory
+    await updateDoc(userDocRef, {
+      inventory: arrayUnion(item),
     });
+
+    console.log(`${item.name} added to inventory.`);
   } catch (error) {
-    console.error('Error setting up real-time coin listener:', error);
+    console.error("Error adding item to inventory:", error);
   }
 }
 
+/**
+ * Remove an item from the user's inventory
+ * @param {string} userId - The unique ID of the logged-in user
+ * @param {Object} item - The item to remove from the inventory
+ */
+export async function removeItemFromInventory(userId, item) {
+  try {
+    const db = getFirestore();
+    const userDocRef = doc(db, "users", userId);
 
+    // Remove item from inventory
+    await updateDoc(userDocRef, {
+      inventory: arrayRemove(item),
+    });
 
+    console.log(`${item.name} removed from inventory.`);
+  } catch (error) {
+    console.error("Error removing item from inventory:", error);
+  }
+}
 
+/**
+ * Fetch the inventory for a specific user
+ * @param {string} userId - The unique ID of the logged-in user
+ * @returns {Promise<Array>} - The user's inventory
+ */
+export async function getUserInventory(userId) {
+  try {
+    const db = getFirestore();
+    const userDocRef = doc(db, "users", userId);
+    const userDoc = await getDoc(userDocRef);
 
+    if (userDoc.exists()) {
+      return userDoc.data().inventory || [];
+    } else {
+      console.error("User document not found in Firestore.");
+      return [];
+    }
+  } catch (error) {
+    console.error("Error fetching user inventory:", error);
+    return [];
+  }
+}
 
-
-
+/**
+ * Listen to real-time inventory updates
+ * @param {string} userId - The unique ID of the logged-in user
+ * @param {function} callback - A function to handle inventory updates
+ */
+export function listenToInventory(userId, callback) {
+  try {
+    const db = getFirestore();
+    const userDocRef = doc(db, "users", userId);
+    return onSnapshot(userDocRef, (doc) => {
+      if (doc.exists()) {
+        callback(doc.data().inventory || []);
+      } else {
+        console.error("User document not found in Firestore for real-time updates.");
+        callback([]);
+      }
+    });
+  } catch (error) {
+    console.error("Error setting up real-time inventory listener:", error);
+  }
+}
