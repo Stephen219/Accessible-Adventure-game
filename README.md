@@ -36,7 +36,9 @@ mport { speechToTextHandler } from './handlers/speech_TextHandler';
 // and to use the speech to text function
 import { speechToTextHandler } from './sTextHandler';
 // and then use the following code to start listening:
-speechToTextHandler.handleStartListening(setTranscript, setIsListening); 
+speechToTextHandler.handleStartListening(setTranscript, setIsListening);
+
+```
 
 
 
