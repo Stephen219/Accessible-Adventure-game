@@ -2,6 +2,10 @@
 
 ## Overview
 This project is built using [Next.js](https://nextjs.org/) and leverages [Firebase](https://firebase.google.com/) for database management and user authentication. 
+
+
+
+
 An accessible adventure game designed for players with dexterity and physical impairments, built with Next.js and Firebase. It emphasizes accessible design and inclusive gameplay to ensure everyone can enjoy an engaging and immersive experience.
 
 The **Adventure Game** is an immersive journey where players step into the shoes of a character named **John**, who is stuck in a mysterious forest. As he navigates through the dense woods, John encounters various challenges that require him to solve puzzles using different items he finds along the way. The items John discovers are of two types: **reusable items**, such as a knife, which can be used multiple times, and **non-reusable items**, such as a stick, which are consumed upon use. Players can carry a maximum of six items in their inventory at any given time. If they pick up more items, they must choose which ones to drop.
